@@ -20,11 +20,9 @@ public class AuthenticationController {
         this.registrationService = registrationService;
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<HttpStatus> register(@RequestBody @Valid Holder holder, BindingResult bindingResult) {
-        System.out.println("Hi my");
         registrationService.save(holder);
-        System.out.println("Hi");
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }

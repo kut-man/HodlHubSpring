@@ -23,11 +23,9 @@ public class HolderDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
         Optional<Holder> holder = holderRepository.findByEmail(email);
-
-        if (holder.isEmpty())
-            throw new UsernameNotFoundException("User Not Found!");
+        if (holder.isEmpty()){
+            throw new UsernameNotFoundException("User Not Found!");}
         return new HolderDetails(holder.get());
     }
 }

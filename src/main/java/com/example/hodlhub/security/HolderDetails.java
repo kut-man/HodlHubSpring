@@ -27,7 +27,7 @@ public class HolderDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.holder.getName();
+        return this.holder.getEmail();
     }
 
     @Override
