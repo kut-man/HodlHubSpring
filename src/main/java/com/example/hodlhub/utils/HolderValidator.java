@@ -26,8 +26,8 @@ public class HolderValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Holder holder = (Holder) target;
 
-        if (holderRepository.findByEmail(holder.getEmail()).isEmpty()){
-            errors.rejectValue("email", "409", "Invalid Email");
+        if (holderRepository.findByEmail(holder.getEmail()).isPresent()){
+            errors.rejectValue("email", "409", "This email is taken!");
         }
     }
 }
