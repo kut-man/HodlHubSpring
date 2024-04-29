@@ -1,6 +1,6 @@
 package com.example.hodlhub.controllers;
 
-import com.example.hodlhub.dto.HolderDTO;
+import com.example.hodlhub.dto.RequestHolderDTO;
 import com.example.hodlhub.models.Holder;
 import com.example.hodlhub.services.RegistrationService;
 import com.example.hodlhub.utils.EmailExistsException;
@@ -33,8 +33,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<HttpStatus> register(@RequestBody @Valid HolderDTO holderDTO, BindingResult bindingResult) {
-        Holder holder = modelMapper.map(holderDTO, Holder.class);
+    public ResponseEntity<HttpStatus> register(@RequestBody @Valid RequestHolderDTO requestHolderDTO, BindingResult bindingResult) {
+        Holder holder = modelMapper.map(requestHolderDTO, Holder.class);
         holderValidator.validate(holder, bindingResult);
         if (bindingResult.hasErrors()) {
             throw new EmailExistsException(ErrorMessageBuilder.buildErrorMessage(bindingResult));
