@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 @Entity
 @Table(name = "Holder")
 public class Holder {
@@ -28,16 +30,8 @@ public class Holder {
     @Column(name = "avatar_url")
     private String avatar;
 
-    public Holder() {
-    }
-
-    public Holder(int id, String name, String email, String password, String avatar) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.avatar = avatar;
-    }
+    @OneToMany(mappedBy = "holder")
+    private List<Portfolio> portfolioList;
 
     public int getId() {
         return id;
@@ -77,6 +71,14 @@ public class Holder {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public List<Portfolio> getPortfolioList() {
+        return portfolioList;
+    }
+
+    public void setPortfolioList(List<Portfolio> portfolioList) {
+        this.portfolioList = portfolioList;
     }
 
     @Override
