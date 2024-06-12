@@ -20,7 +20,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String jsonResponse = "{\"status\": \"success\", " +
+        String jsonResponse = "{\"status\": " + HttpServletResponse.SC_OK + ", " +
                 "\"message\": \"Login successful\", " +
                 "\"username\": \"" + userDetails.getUsername() + "\", " +
                 "}";

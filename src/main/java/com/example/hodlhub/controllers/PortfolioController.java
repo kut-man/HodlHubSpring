@@ -1,6 +1,7 @@
 package com.example.hodlhub.controllers;
 
-import com.example.hodlhub.dto.PortfolioDTO;
+import com.example.hodlhub.dto.request.RequestPortfolioDTO;
+import com.example.hodlhub.dto.response.ResponsePortfolioDTO;
 import com.example.hodlhub.models.Holder;
 import com.example.hodlhub.models.Portfolio;
 import com.example.hodlhub.security.HolderDetails;
@@ -17,6 +18,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/portfolio")
@@ -33,22 +36,44 @@ public class PortfolioController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> register(@RequestBody @Valid PortfolioDTO portfolioDTO,
-                                               BindingResult bindingResult,
-                                               @AuthenticationPrincipal HolderDetails holderDetails) {
+    public ResponseEntity<?> register(@RequestBody @Valid RequestPortfolioDTO portfolioDTO,
+                                      BindingResult bindingResult,
+                                      @AuthenticationPrincipal HolderDetails holderDetails) {
         if (bindingResult.hasErrors()) {
-            throw new RuntimeException(ErrorMessageBuilder.buildErrorMessage(bindingResult));
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            ErrorResponse response = new ErrorResponse(ErrorMessageBuilder.buildErrorMessage(bindingResult), new Date(), status);
+            return new ResponseEntity<>(response, status);
         }
+
         Holder holder = holderService.getHolder(holderDetails.getUsername());
         Portfolio portfolio = modelMapper.map(portfolioDTO, Portfolio.class);
         portfolio.setHolder(holder);
         portfolioService.save(portfolio);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(RuntimeException e) {
-        ErrorResponse response = new ErrorResponse(e.getMessage(), new Date());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    @GetMapping
+    public ResponseEntity<?> getHolderPortfolios(@AuthenticationPrincipal HolderDetails holderDetails) {
+        Holder holder = holderService.getHolder(holderDetails.getUsername());
+
+        List<Portfolio> portfolioList = portfolioService.get(holder.getEmail());
+        List<ResponsePortfolioDTO> portfolioDTOList = portfolioList.stream()
+                .map(portfolio -> modelMapper.map(portfolio, ResponsePortfolioDTO.class))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(portfolioDTOList);
     }
+
+//    @DeleteMapping("/{name}")
+//    public ResponseEntity<?> removePortfolio(@PathVariable String name, @AuthenticationPrincipal HolderDetails holderDetails) {
+//        Holder holder = holderService.getHolder(holderDetails.getUsername());
+//        portfolioService.removePortfolioByNameAndHolder(name, holder);
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    @ExceptionHandler(RuntimeException.class)
+//    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
+//        HttpStatus status = HttpStatus.BAD_REQUEST;
+//        ErrorResponse response = new ErrorResponse(e.getMessage(), new Date(), status);
+//        return new ResponseEntity<>(response, status);
+//    }
 }

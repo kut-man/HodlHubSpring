@@ -1,5 +1,7 @@
 package com.example.hodlhub.utils;
 
+import org.springframework.http.HttpStatus;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,9 +10,12 @@ public class ErrorResponse {
     private List<FieldError> errors;
     private Date date;
 
-    public ErrorResponse(String message, Date date) {
+    private HttpStatus status;
+
+    public ErrorResponse(String message, Date date, HttpStatus status) {
         this.errors = parseMessage(message);
         this.date = date;
+        this.status = status;
     }
 
     public ErrorResponse() {
@@ -32,6 +37,14 @@ public class ErrorResponse {
         this.date = date;
     }
 
+    public HttpStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(HttpStatus status) {
+        this.status = status;
+    }
+
     private List<FieldError> parseMessage(String message) {
         List<FieldError> errorList = new ArrayList<>();
         String[] errorStrings = message.split(";");
@@ -46,11 +59,11 @@ public class ErrorResponse {
 
     public static class FieldError {
         private String field;
-        private String value;
+        private String message;
 
-        public FieldError(String field, String value) {
+        public FieldError(String field, String message) {
             this.field = field;
-            this.value = value;
+            this.message = message;
         }
 
         public String getField() {
@@ -61,12 +74,12 @@ public class ErrorResponse {
             this.field = field;
         }
 
-        public String getValue() {
-            return value;
+        public String getMessage() {
+            return message;
         }
 
-        public void setValue(String value) {
-            this.value = value;
+        public void setMessage(String message) {
+            this.message = message;
         }
     }
 }

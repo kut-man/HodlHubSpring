@@ -1,6 +1,7 @@
 package com.example.hodlhub.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
@@ -21,6 +22,7 @@ public class Holder {
 
     @Column(name = "email")
     @NotEmpty
+    @Email(message = "Email should be valid")
     private String email;
 
     @Column(name = "password_hash")

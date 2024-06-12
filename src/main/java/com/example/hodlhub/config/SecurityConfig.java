@@ -55,7 +55,7 @@ public class SecurityConfig {
         return (request, response, authException) -> {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("{ \"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\" }");
+            response.getWriter().println("{ \"status\": " + HttpServletResponse.SC_UNAUTHORIZED + ", \"message\": \"" + authException.getMessage() + "\" }");
         };
     }
 
@@ -64,7 +64,7 @@ public class SecurityConfig {
         return (request, response, accessDeniedException) -> {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().println("{ \"error\": \"Forbidden\", \"message\": \"" + accessDeniedException.getMessage() + "\" }");
+            response.getWriter().println("{ \"status\": " + HttpServletResponse.SC_FORBIDDEN + ", \"message\": \"" + accessDeniedException.getMessage() + "\" }");
         };
     }
 

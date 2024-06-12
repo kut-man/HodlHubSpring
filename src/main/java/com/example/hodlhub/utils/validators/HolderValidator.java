@@ -1,4 +1,4 @@
-package com.example.hodlhub.utils;
+package com.example.hodlhub.utils.validators;
 
 import com.example.hodlhub.models.Holder;
 import com.example.hodlhub.repositories.HolderRepository;

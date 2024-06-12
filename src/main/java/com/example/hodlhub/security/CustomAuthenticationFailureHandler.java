@@ -18,8 +18,8 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
 
-        String jsonResponse = "{\"status\": \"error\", " +
-                "\"message\": \"Authentication failed: " + exception.getMessage() + "\"}";
+        String jsonResponse = "{\"status\": " + HttpServletResponse.SC_UNAUTHORIZED + ", " +
+                "\"message\": \"" + exception.getMessage() + "\"}";
 
         PrintWriter out = response.getWriter();
         out.print(jsonResponse);

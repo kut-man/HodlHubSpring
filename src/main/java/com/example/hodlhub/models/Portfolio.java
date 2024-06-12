@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "Portfolio")
@@ -34,6 +35,9 @@ public class Portfolio {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
+
+    @OneToMany(mappedBy = "portfolio")
+    private List<Transaction> transactionList;
 
     public int getId() {
         return id;
@@ -81,5 +85,26 @@ public class Portfolio {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public List<Transaction> getTransactionList() {
+        return transactionList;
+    }
+
+    public void setTransactionList(List<Transaction> transactionList) {
+        this.transactionList = transactionList;
+    }
+
+    @Override
+    public String toString() {
+        return "Portfolio{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", color='" + color + '\'' +
+                ", holder=" + holder +
+                ", created=" + created +
+                ", transactionList=" + transactionList +
+                '}';
     }
 }

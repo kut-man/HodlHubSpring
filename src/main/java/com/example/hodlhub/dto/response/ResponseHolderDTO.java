@@ -1,4 +1,4 @@
-package com.example.hodlhub.dto;
+package com.example.hodlhub.dto.response;
 
 public class ResponseHolderDTO {
     private String name;

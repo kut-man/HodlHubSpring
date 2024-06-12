@@ -1,12 +1,11 @@
 package com.example.hodlhub.controllers;
 
-import com.example.hodlhub.dto.RequestHolderDTO;
+import com.example.hodlhub.dto.request.RequestHolderDTO;
 import com.example.hodlhub.models.Holder;
 import com.example.hodlhub.services.RegistrationService;
-import com.example.hodlhub.utils.EmailExistsException;
 import com.example.hodlhub.utils.ErrorMessageBuilder;
 import com.example.hodlhub.utils.ErrorResponse;
-import com.example.hodlhub.utils.HolderValidator;
+import com.example.hodlhub.utils.validators.HolderValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,15 +36,16 @@ public class AuthenticationController {
         Holder holder = modelMapper.map(requestHolderDTO, Holder.class);
         holderValidator.validate(holder, bindingResult);
         if (bindingResult.hasErrors()) {
-            throw new EmailExistsException(ErrorMessageBuilder.buildErrorMessage(bindingResult));
+            throw new IllegalArgumentException(ErrorMessageBuilder.buildErrorMessage(bindingResult));
         }
         registrationService.save(holder);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(EmailExistsException e) {
-        ErrorResponse response = new ErrorResponse(e.getMessage(), new Date());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    private ResponseEntity<ErrorResponse> handleException(IllegalArgumentException e) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse response = new ErrorResponse(e.getMessage(), new Date(), status);
+        return new ResponseEntity<>(response, status);
     }
 }

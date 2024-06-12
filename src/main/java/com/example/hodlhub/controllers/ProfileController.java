@@ -1,6 +1,6 @@
 package com.example.hodlhub.controllers;
 
-import com.example.hodlhub.dto.ResponseHolderDTO;
+import com.example.hodlhub.dto.response.ResponseHolderDTO;
 import com.example.hodlhub.models.Holder;
 import com.example.hodlhub.security.HolderDetails;
 import com.example.hodlhub.services.HolderService;
@@ -29,8 +29,7 @@ public class ProfileController {
             Holder holder = holderService.getHolder(holderDetails.getUsername());
             ResponseHolderDTO responseHolderDTO = modelMapper.map(holder, ResponseHolderDTO.class);
             return ResponseEntity.ok(responseHolderDTO);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
         }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
     }
 }

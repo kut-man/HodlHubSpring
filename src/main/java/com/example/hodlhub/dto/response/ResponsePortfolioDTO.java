@@ -1,19 +1,31 @@
-package com.example.hodlhub.dto;
+package com.example.hodlhub.dto.response;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
-public class PortfolioDTO {
+public class ResponsePortfolioDTO {
+    private int id;
 
-    @NotEmpty(message = "Portfolio name is missing!")
-    @Size(max = 24, message = "Portfolio name should be less then 24 characters!")
     private String name;
 
-    @NotEmpty(message = "Avatar is missing!")
     private String avatar;
 
-    @NotEmpty(message = "Icon background color is missing!")
     private String color;
+
+    private int balance;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -37,5 +49,13 @@ public class PortfolioDTO {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int balance) {
+        this.balance = balance;
     }
 }
