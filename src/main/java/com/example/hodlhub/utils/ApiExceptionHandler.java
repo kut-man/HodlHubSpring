@@ -7,22 +7,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Date;
-
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(value = {CoinNotExistsException.class})
-    public ResponseEntity<Object> handleCoinNotExistsException(CoinNotExistsException e) {
+    @ExceptionHandler(value = {CoinNotExistsException.class, PortfolioNotExistsException.class})
+    public ResponseEntity<ApiResponse<Void>> handleNotFoundExceptions(Exception e) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), new Date(), status);
-        return new ResponseEntity<>(errorResponse, status);
-    }
-
-    @ExceptionHandler(value = {PortfolioNotExistsException.class})
-    public ResponseEntity<Object> handlePortfolioNotExistsException(PortfolioNotExistsException e) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), new Date(), status);
-        return new ResponseEntity<>(errorResponse, status);
+        ApiResponse<Void> response = new ApiResponse<>(
+                status,
+                e.getMessage(),
+                "/transaction"
+        );
+        return new ResponseEntity<>(response, status);
     }
 }

@@ -2,9 +2,12 @@ package com.example.hodlhub.config;
 
 import com.example.hodlhub.security.CustomAuthenticationFailureHandler;
 import com.example.hodlhub.security.CustomAuthenticationSuccessHandler;
+import com.example.hodlhub.utils.ApiResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,11 +21,18 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final ObjectMapper objectMapper;
+
+    public SecurityConfig(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,8 +43,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
                 .formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer
                         .loginPage("/login")
-                        .successHandler(new CustomAuthenticationSuccessHandler())
-                        .failureHandler(new CustomAuthenticationFailureHandler())
+                        .successHandler(new CustomAuthenticationSuccessHandler(objectMapper))
+                        .failureHandler(new CustomAuthenticationFailureHandler(objectMapper))
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -46,7 +56,6 @@ public class SecurityConfig {
                         .authenticationEntryPoint(unauthorizedEntryPoint())
                         .accessDeniedHandler(accessDeniedHandler()));
 
-
         return http.build();
     }
 
@@ -55,7 +64,16 @@ public class SecurityConfig {
         return (request, response, authException) -> {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("{ \"status\": " + HttpServletResponse.SC_UNAUTHORIZED + ", \"message\": \"" + authException.getMessage() + "\" }");
+
+            ApiResponse<Void> apiResponse = new ApiResponse<>(
+                    HttpStatus.UNAUTHORIZED,
+                    authException.getMessage(),
+                    request.getRequestURI()
+            );
+
+            PrintWriter out = response.getWriter();
+            out.print(objectMapper.writeValueAsString(apiResponse));
+            out.flush();
         };
     }
 
@@ -64,7 +82,16 @@ public class SecurityConfig {
         return (request, response, accessDeniedException) -> {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().println("{ \"status\": " + HttpServletResponse.SC_FORBIDDEN + ", \"message\": \"" + accessDeniedException.getMessage() + "\" }");
+
+            ApiResponse<Void> apiResponse = new ApiResponse<>(
+                    HttpStatus.FORBIDDEN,
+                    accessDeniedException.getMessage(),
+                    request.getRequestURI()
+            );
+
+            PrintWriter out = response.getWriter();
+            out.print(objectMapper.writeValueAsString(apiResponse));
+            out.flush();
         };
     }
 

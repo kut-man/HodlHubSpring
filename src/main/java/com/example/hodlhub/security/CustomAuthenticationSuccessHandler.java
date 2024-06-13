@@ -1,32 +1,36 @@
 package com.example.hodlhub.security;
 
-import jakarta.servlet.ServletException;
+import com.example.hodlhub.utils.ApiResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+    private final ObjectMapper objectMapper;
 
+    public CustomAuthenticationSuccessHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-            throws IOException, ServletException {
+            throws IOException {
+
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        String jsonResponse = "{\"status\": " + HttpServletResponse.SC_OK + ", " +
-                "\"message\": \"Login successful\", " +
-                "\"username\": \"" + userDetails.getUsername() + "\", " +
-                "}";
+        ApiResponse<String> apiResponse = new ApiResponse<>(
+                HttpStatus.OK,
+                "Login successful",
+                request.getRequestURI()
+        );
 
         PrintWriter out = response.getWriter();
-        out.print(jsonResponse);
+        out.print(objectMapper.writeValueAsString(apiResponse));
         out.flush();
     }
 }

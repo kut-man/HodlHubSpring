@@ -3,8 +3,7 @@ package com.example.hodlhub.controllers;
 import com.example.hodlhub.dto.request.RequestHolderDTO;
 import com.example.hodlhub.models.Holder;
 import com.example.hodlhub.services.RegistrationService;
-import com.example.hodlhub.utils.ErrorMessageBuilder;
-import com.example.hodlhub.utils.ErrorResponse;
+import com.example.hodlhub.utils.ApiResponse;
 import com.example.hodlhub.utils.validators.HolderValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -13,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 @RestController
 @RequestMapping("/auth")
@@ -32,20 +29,27 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<HttpStatus> register(@RequestBody @Valid RequestHolderDTO requestHolderDTO, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse<Void>> register(@RequestBody @Valid RequestHolderDTO requestHolderDTO, BindingResult bindingResult) {
         Holder holder = modelMapper.map(requestHolderDTO, Holder.class);
         holderValidator.validate(holder, bindingResult);
         if (bindingResult.hasErrors()) {
-            throw new IllegalArgumentException(ErrorMessageBuilder.buildErrorMessage(bindingResult));
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            ApiResponse<Void> response = new ApiResponse<>(
+                    status,
+                    bindingResult,
+                    "/portfolio"
+            );
+            return new ResponseEntity<>(response, status);
         }
         registrationService.save(holder);
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
 
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(IllegalArgumentException e) {
-        HttpStatus status = HttpStatus.CONFLICT;
-        ErrorResponse response = new ErrorResponse(e.getMessage(), new Date(), status);
+        HttpStatus status = HttpStatus.CREATED;
+        ApiResponse<Void> response = new ApiResponse<>(
+                status,
+                "User created successfully",
+                "/auth/register"
+        );
+
         return new ResponseEntity<>(response, status);
     }
 }

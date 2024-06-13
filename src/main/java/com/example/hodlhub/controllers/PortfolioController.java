@@ -7,8 +7,7 @@ import com.example.hodlhub.models.Portfolio;
 import com.example.hodlhub.security.HolderDetails;
 import com.example.hodlhub.services.HolderService;
 import com.example.hodlhub.services.PortfolioService;
-import com.example.hodlhub.utils.ErrorMessageBuilder;
-import com.example.hodlhub.utils.ErrorResponse;
+import com.example.hodlhub.utils.ApiResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -16,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,12 +33,17 @@ public class PortfolioController {
     }
 
     @PostMapping
-    public ResponseEntity<?> register(@RequestBody @Valid RequestPortfolioDTO portfolioDTO,
+    public ResponseEntity<ApiResponse<?>> register(@RequestBody @Valid RequestPortfolioDTO portfolioDTO,
                                       BindingResult bindingResult,
                                       @AuthenticationPrincipal HolderDetails holderDetails) {
+
         if (bindingResult.hasErrors()) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
-            ErrorResponse response = new ErrorResponse(ErrorMessageBuilder.buildErrorMessage(bindingResult), new Date(), status);
+            ApiResponse<Void> response = new ApiResponse<>(
+                    status,
+                    bindingResult,
+                    "/portfolio"
+            );
             return new ResponseEntity<>(response, status);
         }
 
@@ -49,18 +51,35 @@ public class PortfolioController {
         Portfolio portfolio = modelMapper.map(portfolioDTO, Portfolio.class);
         portfolio.setHolder(holder);
         portfolioService.save(portfolio);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        HttpStatus status = HttpStatus.CREATED;
+        ApiResponse<Void> response = new ApiResponse<>(
+                status,
+                "Portfolio created successfully",
+                "/portfolio"
+        );
+
+        return new ResponseEntity<>(response, status);
     }
 
     @GetMapping
-    public ResponseEntity<?> getHolderPortfolios(@AuthenticationPrincipal HolderDetails holderDetails) {
+    public ResponseEntity<ApiResponse<List<ResponsePortfolioDTO>>> getHolderPortfolios(@AuthenticationPrincipal HolderDetails holderDetails) {
         Holder holder = holderService.getHolder(holderDetails.getUsername());
 
         List<Portfolio> portfolioList = portfolioService.get(holder.getEmail());
         List<ResponsePortfolioDTO> portfolioDTOList = portfolioList.stream()
                 .map(portfolio -> modelMapper.map(portfolio, ResponsePortfolioDTO.class))
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(portfolioDTOList);
+
+
+        HttpStatus status = HttpStatus.OK;
+        ApiResponse<List<ResponsePortfolioDTO>> response = new ApiResponse<>(
+                status,
+                portfolioDTOList,
+                "/portfolio"
+        );
+
+        return new ResponseEntity<>(response, status);
     }
 
 //    @DeleteMapping("/{name}")
