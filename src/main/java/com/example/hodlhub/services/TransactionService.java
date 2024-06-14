@@ -49,18 +49,10 @@ public class TransactionService {
 
     public void save(Transaction transaction, String username) {
         Portfolio portfolio = portfolioService.getByIdAndUsername(transaction.getPortfolio().getId(), holderService.getHolder(username).getId());
-
-        if (portfolio == null) {
-            System.out.println("Portfolio does not exist!");
-            throw new PortfolioNotExistsException("Portfolio does not exist! Please provide a valid portfolio ID.");
-        }
+        if (portfolio == null) throw new PortfolioNotExistsException("/transaction");
 
         Coin coin = coinService.getCoinByTicker(transaction.getCoin().getTicker());
-
-        if (coin == null) {
-            System.out.println("Coin does not exist!");
-            throw new CoinNotExistsException("Coin does not exist! Please provide a valid coin ticker.");
-        }
+        if (coin == null) throw new CoinNotExistsException("/transaction");
 
         transaction.setCoin(coin);
         transactionRepository.save(transaction);

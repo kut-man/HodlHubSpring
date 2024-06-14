@@ -24,12 +24,10 @@ public class PortfolioController {
 
     private final PortfolioService portfolioService;
     private final ModelMapper modelMapper;
-    private final HolderService holderService;
 
     public PortfolioController(PortfolioService portfolioService, ModelMapper modelMapper, HolderService holderService) {
         this.portfolioService = portfolioService;
         this.modelMapper = modelMapper;
-        this.holderService = holderService;
     }
 
     @PostMapping
@@ -47,10 +45,8 @@ public class PortfolioController {
             return new ResponseEntity<>(response, status);
         }
 
-        Holder holder = holderService.getHolder(holderDetails.getUsername());
         Portfolio portfolio = modelMapper.map(portfolioDTO, Portfolio.class);
-        portfolio.setHolder(holder);
-        portfolioService.save(portfolio);
+        portfolioService.save(portfolio, holderDetails.getUsername());
 
         HttpStatus status = HttpStatus.CREATED;
         ApiResponse<Void> response = new ApiResponse<>(
@@ -64,13 +60,10 @@ public class PortfolioController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ResponsePortfolioDTO>>> getHolderPortfolios(@AuthenticationPrincipal HolderDetails holderDetails) {
-        Holder holder = holderService.getHolder(holderDetails.getUsername());
-
-        List<Portfolio> portfolioList = portfolioService.get(holder.getEmail());
+        List<Portfolio> portfolioList = portfolioService.get(holderDetails.getUsername());
         List<ResponsePortfolioDTO> portfolioDTOList = portfolioList.stream()
                 .map(portfolio -> modelMapper.map(portfolio, ResponsePortfolioDTO.class))
                 .collect(Collectors.toList());
-
 
         HttpStatus status = HttpStatus.OK;
         ApiResponse<List<ResponsePortfolioDTO>> response = new ApiResponse<>(
@@ -82,12 +75,18 @@ public class PortfolioController {
         return new ResponseEntity<>(response, status);
     }
 
-//    @DeleteMapping("/{name}")
-//    public ResponseEntity<?> removePortfolio(@PathVariable String name, @AuthenticationPrincipal HolderDetails holderDetails) {
-//        Holder holder = holderService.getHolder(holderDetails.getUsername());
-//        portfolioService.removePortfolioByNameAndHolder(name, holder);
-//        return ResponseEntity.noContent().build();
-//    }
+    @DeleteMapping("/{portfolioId}")
+    public ResponseEntity<?> removePortfolio(@PathVariable int portfolioId, @AuthenticationPrincipal HolderDetails holderDetails) {
+        portfolioService.removePortfolioByNameAndHolder(portfolioId, holderDetails.getUsername());
+        HttpStatus status = HttpStatus.OK;
+        ApiResponse<Void> response = new ApiResponse<>(
+                status,
+                "Portfolio removed successfully",
+                "/portfolio"
+        );
+
+        return new ResponseEntity<>(response, status);
+    }
 //
 //    @ExceptionHandler(RuntimeException.class)
 //    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
