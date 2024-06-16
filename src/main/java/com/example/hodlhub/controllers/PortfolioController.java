@@ -2,7 +2,6 @@ package com.example.hodlhub.controllers;
 
 import com.example.hodlhub.dto.request.RequestPortfolioDTO;
 import com.example.hodlhub.dto.response.ResponsePortfolioDTO;
-import com.example.hodlhub.models.Holder;
 import com.example.hodlhub.models.Portfolio;
 import com.example.hodlhub.security.HolderDetails;
 import com.example.hodlhub.services.HolderService;

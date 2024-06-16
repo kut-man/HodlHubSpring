@@ -19,6 +19,8 @@ public class RequestTransactionDTO {
     @Min(value = 0, message = "Transaction portfolio ID is empty!")
     private int portfolioId;
 
+    private String date;
+
     public String getTransactionType() {
         return transactionType;
     }
@@ -57,6 +59,14 @@ public class RequestTransactionDTO {
 
     public void setPortfolioId(int portfolioId) {
         this.portfolioId = portfolioId;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     @Override

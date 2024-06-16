@@ -4,6 +4,7 @@ import com.example.hodlhub.utils.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 @Entity
@@ -34,8 +35,7 @@ public class Transaction {
     private Portfolio portfolio;
 
     @Column(name = "date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private OffsetDateTime date;
 
     public int getId() {
         return id;
@@ -85,11 +85,11 @@ public class Transaction {
         this.portfolio = portfolio;
     }
 
-    public Date getDate() {
+    public OffsetDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(OffsetDateTime date) {
         this.date = date;
     }
 

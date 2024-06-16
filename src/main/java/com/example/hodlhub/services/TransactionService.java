@@ -11,7 +11,9 @@ import com.example.hodlhub.utils.exceptions.PortfolioNotExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Service
 public class TransactionService {
@@ -42,8 +44,14 @@ public class TransactionService {
         portfolio.setId(dto.getPortfolioId());
         transaction.setPortfolio(portfolio);
 
-        transaction.setDate(new Date());
-
+        if (dto.getDate() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+                    "EEE MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)", Locale.ENGLISH);
+            transaction.setDate(OffsetDateTime.parse(dto.getDate(), formatter));
+        }
+        else {
+            transaction.setDate(OffsetDateTime.now());
+        }
         return transaction;
     }
 
