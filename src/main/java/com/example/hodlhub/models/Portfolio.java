@@ -24,6 +24,9 @@ public class Portfolio {
     @NotEmpty
     private String avatar;
 
+    @Transient
+    private long balance;
+
     @Column(name = "bg_color")
     @NotEmpty
     private String color;
@@ -63,6 +66,14 @@ public class Portfolio {
         this.avatar = avatar;
     }
 
+    public long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(long balance) {
+        this.balance = balance;
+    }
+
     public String getColor() {
         return color;
     }
@@ -93,18 +104,5 @@ public class Portfolio {
 
     public void setTransactionList(List<Transaction> transactionList) {
         this.transactionList = transactionList;
-    }
-
-    @Override
-    public String toString() {
-        return "Portfolio{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", color='" + color + '\'' +
-                ", holder=" + holder +
-                ", created=" + created +
-                ", transactionList=" + transactionList +
-                '}';
     }
 }
