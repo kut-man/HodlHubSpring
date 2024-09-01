@@ -10,87 +10,96 @@ import java.util.List;
 @Entity
 @Table(name = "Holder")
 public class Holder {
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+  @Id
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
 
-    @Column(name = "name")
-    @NotEmpty
-    @Size(min = 2, max = 100, message = "Invalid Username")
-    private String name;
+  @Column(name = "name")
+  @NotEmpty
+  @Size(min = 2, max = 100, message = "Invalid Username")
+  private String name;
 
-    @Column(name = "email")
-    @NotEmpty
-    @Email(message = "Email should be valid")
-    private String email;
+  @Column(name = "email")
+  @NotEmpty
+  @Email(message = "Email should be valid")
+  private String email;
 
-    @Column(name = "password_hash")
-    @NotEmpty
-    private String password;
+  @Column(name = "password_hash")
+  @NotEmpty
+  private String password;
 
-    @Column(name = "avatar_url")
-    private String avatar;
+  @Column(name = "avatar_url")
+  private String avatar;
 
-    @OneToMany(mappedBy = "holder")
-    private List<Portfolio> portfolioList;
+  @OneToMany(mappedBy = "holder")
+  private List<Portfolio> portfolioList;
 
-    public int getId() {
-        return id;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+  public void setId(int id) {
+    this.id = id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public String getAvatar() {
-        return avatar;
-    }
+  public String getAvatar() {
+    return avatar;
+  }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+  public void setAvatar(String avatar) {
+    this.avatar = avatar;
+  }
 
-    public List<Portfolio> getPortfolioList() {
-        return portfolioList;
-    }
+  public List<Portfolio> getPortfolioList() {
+    return portfolioList;
+  }
 
-    public void setPortfolioList(List<Portfolio> portfolioList) {
-        this.portfolioList = portfolioList;
-    }
+  public void setPortfolioList(List<Portfolio> portfolioList) {
+    this.portfolioList = portfolioList;
+  }
 
-    @Override
-    public String toString() {
-        return "Holder{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", avatar='" + avatar + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "Holder{"
+        + "id="
+        + id
+        + ", name='"
+        + name
+        + '\''
+        + ", email='"
+        + email
+        + '\''
+        + ", password='"
+        + password
+        + '\''
+        + ", avatar='"
+        + avatar
+        + '\''
+        + '}';
+  }
 }

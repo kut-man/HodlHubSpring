@@ -5,6 +5,6 @@ import java.math.BigDecimal;
 public interface CoinNetAmountProjection {
 
     String getCoinTicker();
-    BigDecimal getNetAmount();
+    long getNetAmount();
 
 }

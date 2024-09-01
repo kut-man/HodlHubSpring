@@ -10,18 +10,18 @@ import java.util.List;
 @Service
 public class CoinService {
 
-    private final CoinRepository coinRepository;
+  private final CoinRepository coinRepository;
 
-    @Autowired
-    public CoinService(CoinRepository coinRepository) {
-        this.coinRepository = coinRepository;
-    }
+  @Autowired
+  public CoinService(CoinRepository coinRepository) {
+    this.coinRepository = coinRepository;
+  }
 
-    public Coin getCoinByTicker(String ticker) {
-        return coinRepository.findByTicker(ticker).orElse(null);
-    }
+  public Coin getCoinByTicker(String ticker) {
+    return coinRepository.findByTicker(ticker).orElse(null);
+  }
 
-    public List<Coin> getCoins() {
-        return coinRepository.findAll();
-    }
+  public List<Coin> getCoins() {
+    return coinRepository.findAll();
+  }
 }

@@ -21,76 +21,68 @@ import java.util.stream.Collectors;
 @RequestMapping("/portfolio")
 public class PortfolioController {
 
-    private final PortfolioService portfolioService;
-    private final ModelMapper modelMapper;
+  private final PortfolioService portfolioService;
+  private final ModelMapper modelMapper;
 
-    public PortfolioController(PortfolioService portfolioService, ModelMapper modelMapper, HolderService holderService) {
-        this.portfolioService = portfolioService;
-        this.modelMapper = modelMapper;
+  public PortfolioController(
+      PortfolioService portfolioService, ModelMapper modelMapper, HolderService holderService) {
+    this.portfolioService = portfolioService;
+    this.modelMapper = modelMapper;
+  }
+
+  @PostMapping
+  public ResponseEntity<ApiResponse<?>> register(
+      @RequestBody @Valid RequestPortfolioDTO portfolioDTO,
+      BindingResult bindingResult,
+      @AuthenticationPrincipal HolderDetails holderDetails) {
+
+    if (bindingResult.hasErrors()) {
+      HttpStatus status = HttpStatus.BAD_REQUEST;
+      ApiResponse<Void> response = new ApiResponse<>(status, bindingResult, "/portfolio");
+      return new ResponseEntity<>(response, status);
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<?>> register(@RequestBody @Valid RequestPortfolioDTO portfolioDTO,
-                                      BindingResult bindingResult,
-                                      @AuthenticationPrincipal HolderDetails holderDetails) {
+    Portfolio portfolio = modelMapper.map(portfolioDTO, Portfolio.class);
+    portfolioService.save(portfolio, holderDetails.getUsername());
 
-        if (bindingResult.hasErrors()) {
-            HttpStatus status = HttpStatus.BAD_REQUEST;
-            ApiResponse<Void> response = new ApiResponse<>(
-                    status,
-                    bindingResult,
-                    "/portfolio"
-            );
-            return new ResponseEntity<>(response, status);
-        }
+    HttpStatus status = HttpStatus.CREATED;
+    ApiResponse<Void> response =
+        new ApiResponse<>(status, "Portfolio created successfully", "/portfolio");
 
-        Portfolio portfolio = modelMapper.map(portfolioDTO, Portfolio.class);
-        portfolioService.save(portfolio, holderDetails.getUsername());
+    return new ResponseEntity<>(response, status);
+  }
 
-        HttpStatus status = HttpStatus.CREATED;
-        ApiResponse<Void> response = new ApiResponse<>(
-                status,
-                "Portfolio created successfully",
-                "/portfolio"
-        );
+  @GetMapping
+  public ResponseEntity<ApiResponse<List<ResponsePortfolioDTO>>> getHolderPortfolios(
+      @AuthenticationPrincipal HolderDetails holderDetails) {
+    List<Portfolio> portfolioList = portfolioService.get(holderDetails.getUsername());
+    List<ResponsePortfolioDTO> portfolioDTOList =
+        portfolioList.stream()
+            .map(portfolio -> modelMapper.map(portfolio, ResponsePortfolioDTO.class))
+            .collect(Collectors.toList());
 
-        return new ResponseEntity<>(response, status);
-    }
+    HttpStatus status = HttpStatus.OK;
+    ApiResponse<List<ResponsePortfolioDTO>> response =
+        new ApiResponse<>(status, portfolioDTOList, "/portfolio");
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ResponsePortfolioDTO>>> getHolderPortfolios(@AuthenticationPrincipal HolderDetails holderDetails) {
-        List<Portfolio> portfolioList = portfolioService.get(holderDetails.getUsername());
-        List<ResponsePortfolioDTO> portfolioDTOList = portfolioList.stream()
-                .map(portfolio -> modelMapper.map(portfolio, ResponsePortfolioDTO.class))
-                .collect(Collectors.toList());
+    return new ResponseEntity<>(response, status);
+  }
 
-        HttpStatus status = HttpStatus.OK;
-        ApiResponse<List<ResponsePortfolioDTO>> response = new ApiResponse<>(
-                status,
-                portfolioDTOList,
-                "/portfolio"
-        );
+  @DeleteMapping("/{portfolioId}")
+  public ResponseEntity<?> removePortfolio(
+      @PathVariable int portfolioId, @AuthenticationPrincipal HolderDetails holderDetails) {
+    portfolioService.removePortfolioByNameAndHolder(portfolioId, holderDetails.getUsername());
+    HttpStatus status = HttpStatus.OK;
+    ApiResponse<Void> response =
+        new ApiResponse<>(status, "Portfolio removed successfully", "/portfolio");
 
-        return new ResponseEntity<>(response, status);
-    }
-
-    @DeleteMapping("/{portfolioId}")
-    public ResponseEntity<?> removePortfolio(@PathVariable int portfolioId, @AuthenticationPrincipal HolderDetails holderDetails) {
-        portfolioService.removePortfolioByNameAndHolder(portfolioId, holderDetails.getUsername());
-        HttpStatus status = HttpStatus.OK;
-        ApiResponse<Void> response = new ApiResponse<>(
-                status,
-                "Portfolio removed successfully",
-                "/portfolio"
-        );
-
-        return new ResponseEntity<>(response, status);
-    }
-//
-//    @ExceptionHandler(RuntimeException.class)
-//    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
-//        HttpStatus status = HttpStatus.BAD_REQUEST;
-//        ErrorResponse response = new ErrorResponse(e.getMessage(), new Date(), status);
-//        return new ResponseEntity<>(response, status);
-//    }
+    return new ResponseEntity<>(response, status);
+  }
+  //
+  //    @ExceptionHandler(RuntimeException.class)
+  //    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
+  //        HttpStatus status = HttpStatus.BAD_REQUEST;
+  //        ErrorResponse response = new ErrorResponse(e.getMessage(), new Date(), status);
+  //        return new ResponseEntity<>(response, status);
+  //    }
 }

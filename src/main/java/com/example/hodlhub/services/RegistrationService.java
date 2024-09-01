@@ -8,18 +8,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RegistrationService {
-    private final HolderRepository holderRepository;
-    private final PasswordEncoder passwordEncoder;
+  private final HolderRepository holderRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public RegistrationService(HolderRepository holderRepository, PasswordEncoder passwordEncoder) {
-        this.holderRepository = holderRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+  @Autowired
+  public RegistrationService(HolderRepository holderRepository, PasswordEncoder passwordEncoder) {
+    this.holderRepository = holderRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
 
-
-    public void save(Holder holder){
-        holder.setPassword(passwordEncoder.encode(holder.getPassword()));
-        holderRepository.save(holder);
-    }
+  public void save(Holder holder) {
+    holder.setPassword(passwordEncoder.encode(holder.getPassword()));
+    holderRepository.save(holder);
+  }
 }

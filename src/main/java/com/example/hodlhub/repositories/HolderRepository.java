@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface HolderRepository extends JpaRepository<Holder, Integer> {
-    Optional<Holder> findByEmail(String email);
+  Optional<Holder> findByEmail(String email);
 }

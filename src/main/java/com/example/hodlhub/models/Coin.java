@@ -8,61 +8,63 @@ import java.util.List;
 @Entity
 @Table(name = "Coin")
 public class Coin {
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+  @Id
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
 
-    @NotNull
-    @Column(name = "name")
-    private String name;
-    @NotNull
-    @Column(name = "logo_url")
-    private String logo;
-    @NotNull
-    @Column(name = "ticker")
-    private String ticker;
+  @NotNull
+  @Column(name = "name")
+  private String name;
 
-    @OneToMany(mappedBy = "coin")
-    private List<Transaction> transactionList;
+  @NotNull
+  @Column(name = "logo_url")
+  private String logo;
 
-    public int getId() {
-        return id;
-    }
+  @NotNull
+  @Column(name = "ticker")
+  private String ticker;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+  @OneToMany(mappedBy = "coin")
+  private List<Transaction> transactionList;
 
-    public String getName() {
-        return name;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setId(int id) {
+    this.id = id;
+  }
 
-    public String getLogo() {
-        return logo;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getTicker() {
-        return ticker;
-    }
+  public String getLogo() {
+    return logo;
+  }
 
-    public void setTicker(String ticker) {
-        this.ticker = ticker;
-    }
+  public void setLogo(String logo) {
+    this.logo = logo;
+  }
 
-    public List<Transaction> getTransactionList() {
-        return transactionList;
-    }
+  public String getTicker() {
+    return ticker;
+  }
 
-    public void setTransactionList(List<Transaction> transactionList) {
-        this.transactionList = transactionList;
-    }
+  public void setTicker(String ticker) {
+    this.ticker = ticker;
+  }
+
+  public List<Transaction> getTransactionList() {
+    return transactionList;
+  }
+
+  public void setTransactionList(List<Transaction> transactionList) {
+    this.transactionList = transactionList;
+  }
 }

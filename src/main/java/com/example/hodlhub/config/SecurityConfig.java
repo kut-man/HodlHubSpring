@@ -28,87 +28,89 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-    public SecurityConfig(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+  public SecurityConfig(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .cors((cors) -> cors
-                        .configurationSource(corsConfigurationSource())
-                )
-                .authorizeHttpRequests(request -> request.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
-                .formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer
-                        .loginPage("/login")
-                        .successHandler(new CustomAuthenticationSuccessHandler(objectMapper))
-                        .failureHandler(new CustomAuthenticationFailureHandler(objectMapper))
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()) // Use HttpStatusReturningLogoutSuccessHandler
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID"))
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
+        .authorizeHttpRequests(
+            request -> request.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
+        .formLogin(
+            httpSecurityFormLoginConfigurer ->
+                httpSecurityFormLoginConfigurer
+                    .loginPage("/login")
+                    .successHandler(new CustomAuthenticationSuccessHandler(objectMapper))
+                    .failureHandler(new CustomAuthenticationFailureHandler(objectMapper))
+                    .permitAll())
+        .logout(
+            logout ->
+                logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessHandler(
+                        new HttpStatusReturningLogoutSuccessHandler()) // Use
+                                                                       // HttpStatusReturningLogoutSuccessHandler
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID"))
+        .exceptionHandling(
+            exceptionHandlingConfigurer ->
+                exceptionHandlingConfigurer
+                    .authenticationEntryPoint(unauthorizedEntryPoint())
+                    .accessDeniedHandler(accessDeniedHandler()));
 
-                .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer
-                        .authenticationEntryPoint(unauthorizedEntryPoint())
-                        .accessDeniedHandler(accessDeniedHandler()));
+    return http.build();
+  }
 
-        return http.build();
-    }
+  @Bean
+  public AuthenticationEntryPoint unauthorizedEntryPoint() {
+    return (request, response, authException) -> {
+      response.setContentType("application/json");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-    @Bean
-    public AuthenticationEntryPoint unauthorizedEntryPoint() {
-        return (request, response, authException) -> {
-            response.setContentType("application/json");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      ApiResponse<Void> apiResponse =
+          new ApiResponse<>(
+              HttpStatus.UNAUTHORIZED, authException.getMessage(), request.getRequestURI());
 
-            ApiResponse<Void> apiResponse = new ApiResponse<>(
-                    HttpStatus.UNAUTHORIZED,
-                    authException.getMessage(),
-                    request.getRequestURI()
-            );
+      PrintWriter out = response.getWriter();
+      out.print(objectMapper.writeValueAsString(apiResponse));
+      out.flush();
+    };
+  }
 
-            PrintWriter out = response.getWriter();
-            out.print(objectMapper.writeValueAsString(apiResponse));
-            out.flush();
-        };
-    }
+  @Bean
+  public AccessDeniedHandler accessDeniedHandler() {
+    return (request, response, accessDeniedException) -> {
+      response.setContentType("application/json");
+      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            response.setContentType("application/json");
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      ApiResponse<Void> apiResponse =
+          new ApiResponse<>(
+              HttpStatus.FORBIDDEN, accessDeniedException.getMessage(), request.getRequestURI());
 
-            ApiResponse<Void> apiResponse = new ApiResponse<>(
-                    HttpStatus.FORBIDDEN,
-                    accessDeniedException.getMessage(),
-                    request.getRequestURI()
-            );
+      PrintWriter out = response.getWriter();
+      out.print(objectMapper.writeValueAsString(apiResponse));
+      out.flush();
+    };
+  }
 
-            PrintWriter out = response.getWriter();
-            out.print(objectMapper.writeValueAsString(apiResponse));
-            out.flush();
-        };
-    }
+  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedOrigin("http://localhost:5173");
+    configuration.setAllowedMethods(Arrays.asList("POST", "GET"));
+    configuration.setAllowCredentials(true);
+    configuration.addAllowedHeader("*");
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:5173");
-        configuration.setAllowedMethods(Arrays.asList("POST", "GET"));
-        configuration.setAllowCredentials(true);
-        configuration.addAllowedHeader("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder getPasswordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }

@@ -1,33 +1,33 @@
 package com.example.hodlhub.dto.response;
 
 public class ResponseHolderDTO {
-    private String name;
+  private String name;
 
-    private String email;
+  private String email;
 
-    private String avatar;
+  private String avatar;
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public String getAvatar() {
-        return avatar;
-    }
+  public String getAvatar() {
+    return avatar;
+  }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+  public void setAvatar(String avatar) {
+    this.avatar = avatar;
+  }
 }

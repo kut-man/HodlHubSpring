@@ -5,78 +5,85 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public class RequestTransactionDTO {
-    @ValidTransactionType
-    private String transactionType;
-    @Min(value = 0, message = "Transaction amount is empty!")
-    private long amount;
+  @ValidTransactionType private String transactionType;
 
-    @NotNull(message = "Transaction coin is empty!")
-    private String coin;
+  @Min(value = 0, message = "Transaction amount is empty!")
+  private long amount;
 
-    @Min(value = 0, message = "Transaction price per coin is empty!")
-    private long pricePerCoin;
+  @NotNull(message = "Transaction coin is empty!")
+  private String coin;
 
-    @Min(value = 0, message = "Transaction portfolio ID is empty!")
-    private int portfolioId;
+  @Min(value = 0, message = "Transaction price per coin is empty!")
+  private long pricePerCoin;
 
-    private String date;
+  @Min(value = 0, message = "Transaction portfolio ID is empty!")
+  private int portfolioId;
 
-    public String getTransactionType() {
-        return transactionType;
-    }
+  private String date;
 
-    public void setTransactionType(String transactionType) {
-        this.transactionType = transactionType;
-    }
+  public String getTransactionType() {
+    return transactionType;
+  }
 
-    public long getAmount() {
-        return amount;
-    }
+  public void setTransactionType(String transactionType) {
+    this.transactionType = transactionType;
+  }
 
-    public void setAmount(long amount) {
-        this.amount = amount;
-    }
+  public long getAmount() {
+    return amount;
+  }
 
-    public String getCoin() {
-        return coin;
-    }
+  public void setAmount(long amount) {
+    this.amount = amount;
+  }
 
-    public void setCoin(String coin) {
-        this.coin = coin;
-    }
+  public String getCoin() {
+    return coin;
+  }
 
-    public long getPricePerCoin() {
-        return pricePerCoin;
-    }
+  public void setCoin(String coin) {
+    this.coin = coin;
+  }
 
-    public void setPricePerCoin(long pricePerCoin) {
-        this.pricePerCoin = pricePerCoin;
-    }
+  public long getPricePerCoin() {
+    return pricePerCoin;
+  }
 
-    public int getPortfolioId() {
-        return portfolioId;
-    }
+  public void setPricePerCoin(long pricePerCoin) {
+    this.pricePerCoin = pricePerCoin;
+  }
 
-    public void setPortfolioId(int portfolioId) {
-        this.portfolioId = portfolioId;
-    }
+  public int getPortfolioId() {
+    return portfolioId;
+  }
 
-    public String getDate() {
-        return date;
-    }
+  public void setPortfolioId(int portfolioId) {
+    this.portfolioId = portfolioId;
+  }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+  public String getDate() {
+    return date;
+  }
 
-    @Override
-    public String toString() {
-        return "RequestTransactionDTO{" +
-                "transactionType='" + transactionType + '\'' +
-                ", amount=" + amount +
-                ", coin='" + coin + '\'' +
-                ", pricePerCoin=" + pricePerCoin +
-                ", portfolioId=" + portfolioId +
-                '}';
-    }
+  public void setDate(String date) {
+    this.date = date;
+  }
+
+  @Override
+  public String toString() {
+    return "RequestTransactionDTO{"
+        + "transactionType='"
+        + transactionType
+        + '\''
+        + ", amount="
+        + amount
+        + ", coin='"
+        + coin
+        + '\''
+        + ", pricePerCoin="
+        + pricePerCoin
+        + ", portfolioId="
+        + portfolioId
+        + '}';
+  }
 }

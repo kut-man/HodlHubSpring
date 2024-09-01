@@ -20,36 +20,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/transaction")
 public class TransactionController {
 
-    private final TransactionService transactionService;
+  private final TransactionService transactionService;
 
-    @Autowired
-    public TransactionController(TransactionService transactionService) {
-        this.transactionService = transactionService;
+  @Autowired
+  public TransactionController(TransactionService transactionService) {
+    this.transactionService = transactionService;
+  }
+
+  @PostMapping
+  public ResponseEntity<ApiResponse<Void>> add(
+      @RequestBody @Valid RequestTransactionDTO requestTransactionDTO,
+      BindingResult bindingResult,
+      @AuthenticationPrincipal HolderDetails holderDetails) {
+    if (bindingResult.hasErrors()) {
+      HttpStatus status = HttpStatus.BAD_REQUEST;
+      ApiResponse<Void> response = new ApiResponse<>(status, bindingResult, "/transaction");
+      return new ResponseEntity<>(response, status);
     }
+    Transaction transaction = transactionService.mapToEntity(requestTransactionDTO);
+    transactionService.save(transaction, holderDetails.getUsername());
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<Void>> add(@RequestBody @Valid RequestTransactionDTO requestTransactionDTO,
-                                               BindingResult bindingResult,
-                                               @AuthenticationPrincipal HolderDetails holderDetails) {
-        if (bindingResult.hasErrors()) {
-            HttpStatus status = HttpStatus.BAD_REQUEST;
-            ApiResponse<Void> response = new ApiResponse<>(
-                    status,
-                    bindingResult,
-                    "/transaction"
-            );
-            return new ResponseEntity<>(response, status);
-        }
-        Transaction transaction = transactionService.mapToEntity(requestTransactionDTO);
-        transactionService.save(transaction, holderDetails.getUsername());
+    HttpStatus status = HttpStatus.CREATED;
+    ApiResponse<Void> response =
+        new ApiResponse<>(status, "Transaction added successfully", "/transaction");
 
-        HttpStatus status = HttpStatus.CREATED;
-        ApiResponse<Void> response = new ApiResponse<>(
-                status,
-                "Transaction added successfully",
-                "/transaction"
-        );
-
-        return new ResponseEntity<>(response, status);
-    }
+    return new ResponseEntity<>(response, status);
+  }
 }

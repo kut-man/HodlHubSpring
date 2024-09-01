@@ -14,25 +14,26 @@ import java.util.Map;
 @Configuration
 public class JacksonConfig {
 
-    @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
+  @Bean
+  public ObjectMapper objectMapper() {
+    ObjectMapper objectMapper = new ObjectMapper();
 
-        // Enable pretty printing of JSON
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+    // Enable pretty printing of JSON
+    objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        // Configure Jackson to ignore null values globally
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.registerModule(new JavaTimeModule());
+    // Configure Jackson to ignore null values globally
+    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    objectMapper.registerModule(new JavaTimeModule());
 
-        objectMapper
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .setDateFormat(new StdDateFormat())
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    objectMapper
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        .setDateFormat(new StdDateFormat())
+        .setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-        objectMapper.configOverride(Map.class)
-                .setInclude(JsonInclude.Value.construct(Include.NON_NULL, Include.NON_NULL));
+    objectMapper
+        .configOverride(Map.class)
+        .setInclude(JsonInclude.Value.construct(Include.NON_NULL, Include.NON_NULL));
 
-        return objectMapper;
-    }
+    return objectMapper;
+  }
 }

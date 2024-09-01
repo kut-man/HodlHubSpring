@@ -10,24 +10,24 @@ import org.springframework.validation.Validator;
 @Component
 public class HolderValidator implements Validator {
 
-    private final HolderRepository holderRepository;
+  private final HolderRepository holderRepository;
 
-    @Autowired
-    public HolderValidator(HolderRepository holderRepository) {
-        this.holderRepository = holderRepository;
+  @Autowired
+  public HolderValidator(HolderRepository holderRepository) {
+    this.holderRepository = holderRepository;
+  }
+
+  @Override
+  public boolean supports(Class<?> clazz) {
+    return Holder.class.equals(clazz);
+  }
+
+  @Override
+  public void validate(Object target, Errors errors) {
+    Holder holder = (Holder) target;
+
+    if (holderRepository.findByEmail(holder.getEmail()).isPresent()) {
+      errors.rejectValue("email", "409", "This email is taken!");
     }
-
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return Holder.class.equals(clazz);
-    }
-
-    @Override
-    public void validate(Object target, Errors errors) {
-        Holder holder = (Holder) target;
-
-        if (holderRepository.findByEmail(holder.getEmail()).isPresent()){
-            errors.rejectValue("email", "409", "This email is taken!");
-        }
-    }
+  }
 }

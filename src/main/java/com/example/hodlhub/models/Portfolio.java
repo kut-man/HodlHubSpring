@@ -25,7 +25,7 @@ public class Portfolio {
     private String avatar;
 
     @Transient
-    private long balance;
+    private double balance;
 
     @Column(name = "bg_color")
     @NotEmpty
@@ -66,11 +66,11 @@ public class Portfolio {
         this.avatar = avatar;
     }
 
-    public long getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(long balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

@@ -17,7 +17,7 @@ public class ResponsePortfolioDTO {
 
     private String color;
 
-    private long balance;
+    private double balance;
 
     public int getId() {
         return id;
@@ -51,11 +51,11 @@ public class ResponsePortfolioDTO {
         this.color = color;
     }
 
-    public long getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(long balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 }
