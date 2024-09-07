@@ -1,61 +1,83 @@
 package com.example.hodlhub.dto.response;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
-
 public class ResponsePortfolioDTO {
-    private int id;
+  private int id;
 
-    private String name;
+  private String name;
 
-    private String avatar;
+  private String avatar;
 
-    private String color;
+  private String color;
 
-    private double balance;
+  private double totalInvestment;
 
-    public int getId() {
-        return id;
-    }
+  private double totalValue;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+  private double totalProfitLoss;
 
-    public String getName() {
-        return name;
-    }
+  private double totalValueChange24h;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public String getAvatar() {
-        return avatar;
-    }
+  public void setId(int id) {
+    this.id = id;
+  }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getColor() {
-        return color;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
+  public String getAvatar() {
+    return avatar;
+  }
 
-    public double getBalance() {
-        return balance;
-    }
+  public void setAvatar(String avatar) {
+    this.avatar = avatar;
+  }
 
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
+  public String getColor() {
+    return color;
+  }
+
+  public void setColor(String color) {
+    this.color = color;
+  }
+
+  public double getTotalInvestment() {
+    return totalInvestment;
+  }
+
+  public void setTotalInvestment(double totalInvestment) {
+    this.totalInvestment = totalInvestment;
+  }
+
+  public double getTotalValue() {
+    return totalValue;
+  }
+
+  public void setTotalValue(double totalValue) {
+    this.totalValue = totalValue;
+  }
+
+  public double getTotalProfitLoss() {
+    return totalProfitLoss;
+  }
+
+  public void setTotalProfitLoss(double totalProfitLoss) {
+    this.totalProfitLoss = totalProfitLoss;
+  }
+
+  public double getTotalValueChange24h() {
+    return totalValueChange24h;
+  }
+
+  public void setTotalValueChange24h(double totalValueChange24h) {
+    this.totalValueChange24h = totalValueChange24h;
+  }
 }

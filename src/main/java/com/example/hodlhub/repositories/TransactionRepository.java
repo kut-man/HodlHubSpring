@@ -1,5 +1,6 @@
 package com.example.hodlhub.repositories;
 
+import com.example.hodlhub.models.Portfolio;
 import com.example.hodlhub.models.Transaction;
 import com.example.hodlhub.utils.CoinNetAmountProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
           + "WHERE t.portfolio.id = :portfolioId "
           + "GROUP BY c.ticker")
   List<CoinNetAmountProjection> findNetAmountsByPortfolio(@Param("portfolioId") int portfolioId);
+
+  List<Transaction> findByPortfolioId(int portfolioId);
 }

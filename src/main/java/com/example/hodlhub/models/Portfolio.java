@@ -10,99 +10,128 @@ import java.util.List;
 @Entity
 @Table(name = "Portfolio")
 public class Portfolio {
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+  @Id
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
 
-    @Column(name = "name")
-    @NotEmpty
-    @Size(max = 24, message = "Portfolio name should be less then 24 characters!")
-    private String name;
+  @Column(name = "name")
+  @NotEmpty
+  @Size(max = 24, message = "Portfolio name should be less then 24 characters!")
+  private String name;
 
-    @Column(name = "avatar")
-    @NotEmpty
-    private String avatar;
+  @Column(name = "avatar")
+  @NotEmpty
+  private String avatar;
 
-    @Transient
-    private double balance;
+  @Transient private double totalInvestment;
 
-    @Column(name = "bg_color")
-    @NotEmpty
-    private String color;
+  @Transient private double totalValue;
 
-    @ManyToOne
-    @JoinColumn(name = "holder_id", referencedColumnName = "id")
-    private Holder holder;
+  @Transient private double totalProfitLoss;
 
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date created;
+  @Transient private double totalValueChange24h;
 
-    @OneToMany(mappedBy = "portfolio")
-    private List<Transaction> transactionList;
+  @Column(name = "bg_color")
+  @NotEmpty
+  private String color;
 
-    public int getId() {
-        return id;
-    }
+  @ManyToOne
+  @JoinColumn(name = "holder_id", referencedColumnName = "id")
+  private Holder holder;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+  @Column(name = "created_at")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
 
-    public String getName() {
-        return name;
-    }
+  @OneToMany(mappedBy = "portfolio")
+  private List<Transaction> transactionList;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public String getAvatar() {
-        return avatar;
-    }
+  public void setId(int id) {
+    this.id = id;
+  }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public double getBalance() {
-        return balance;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
+  public String getAvatar() {
+    return avatar;
+  }
 
-    public String getColor() {
-        return color;
-    }
+  public void setAvatar(String avatar) {
+    this.avatar = avatar;
+  }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
+  public double getTotalInvestment() {
+    return totalInvestment;
+  }
 
-    public Holder getHolder() {
-        return holder;
-    }
+  public void setTotalInvestment(double totalInvestment) {
+    this.totalInvestment = totalInvestment;
+  }
 
-    public void setHolder(Holder holder) {
-        this.holder = holder;
-    }
+  public double getTotalValue() {
+    return totalValue;
+  }
 
-    public Date getCreated() {
-        return created;
-    }
+  public void setTotalValue(double totalValue) {
+    this.totalValue = totalValue;
+  }
 
-    public void setCreated(Date created) {
-        this.created = created;
-    }
+  public double getTotalProfitLoss() {
+    return totalProfitLoss;
+  }
 
-    public List<Transaction> getTransactionList() {
-        return transactionList;
-    }
+  public void setTotalProfitLoss(double totalProfitLoss) {
+    this.totalProfitLoss = totalProfitLoss;
+  }
 
-    public void setTransactionList(List<Transaction> transactionList) {
-        this.transactionList = transactionList;
-    }
+  public double getTotalValueChange24h() {
+    return totalValueChange24h;
+  }
+
+  public void setTotalValueChange24h(double totalValueChange24h) {
+    this.totalValueChange24h = totalValueChange24h;
+  }
+
+  public String getColor() {
+    return color;
+  }
+
+  public void setColor(String color) {
+    this.color = color;
+  }
+
+  public Holder getHolder() {
+    return holder;
+  }
+
+  public void setHolder(Holder holder) {
+    this.holder = holder;
+  }
+
+  public Date getCreated() {
+    return created;
+  }
+
+  public void setCreated(Date created) {
+    this.created = created;
+  }
+
+  public List<Transaction> getTransactionList() {
+    return transactionList;
+  }
+
+  public void setTransactionList(List<Transaction> transactionList) {
+    this.transactionList = transactionList;
+  }
 }
