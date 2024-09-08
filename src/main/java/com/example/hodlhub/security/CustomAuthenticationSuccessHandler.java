@@ -1,6 +1,6 @@
 package com.example.hodlhub.security;
 
-import com.example.hodlhub.utils.ApiResponse;
+import com.example.hodlhub.util.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

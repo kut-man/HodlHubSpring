@@ -1,6 +1,6 @@
 package com.example.hodlhub.security;
 
-import com.example.hodlhub.models.Holder;
+import com.example.hodlhub.model.Holder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

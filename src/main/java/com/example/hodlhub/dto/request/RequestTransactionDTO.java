@@ -1,6 +1,6 @@
 package com.example.hodlhub.dto.request;
 
-import com.example.hodlhub.utils.annotations.ValidTransactionType;
+import com.example.hodlhub.util.annotations.ValidTransactionType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
