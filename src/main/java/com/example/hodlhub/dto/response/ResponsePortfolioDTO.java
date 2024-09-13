@@ -14,8 +14,6 @@ public class ResponsePortfolioDTO {
 
   private String color;
 
-  private double totalInvestment;
-
   private double totalValue;
 
   private double totalValueChange24h;
@@ -54,14 +52,6 @@ public class ResponsePortfolioDTO {
 
   public void setColor(String color) {
     this.color = color;
-  }
-
-  public double getTotalInvestment() {
-    return totalInvestment;
-  }
-
-  public void setTotalInvestment(double totalInvestment) {
-    this.totalInvestment = totalInvestment;
   }
 
   public double getTotalValue() {

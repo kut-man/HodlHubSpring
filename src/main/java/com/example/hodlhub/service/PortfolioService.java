@@ -1,6 +1,7 @@
 package com.example.hodlhub.service;
 
 import com.example.hodlhub.model.Holder;
+import com.example.hodlhub.model.Holding;
 import com.example.hodlhub.model.Portfolio;
 import com.example.hodlhub.model.Transaction;
 import com.example.hodlhub.repository.PortfolioRepository;
@@ -8,15 +9,10 @@ import com.example.hodlhub.repository.TransactionRepository;
 import com.example.hodlhub.util.CoinNetAmountProjection;
 import com.example.hodlhub.util.enums.TransactionType;
 import com.example.hodlhub.util.exceptions.PortfolioNotExistsException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PortfolioService {
@@ -24,6 +20,7 @@ public class PortfolioService {
   private final TransactionRepository transactionRepository;
   private final HolderService holderService;
   private final StatisticService statisticService;
+  private final HoldingService holdingService;
   private final ObjectMapper objectMapper;
 
   public PortfolioService(
@@ -31,12 +28,14 @@ public class PortfolioService {
       HolderService holderService,
       ObjectMapper objectMapper,
       TransactionRepository transactionRepository,
-      StatisticService statisticService) {
+      StatisticService statisticService,
+      HoldingService holdingService) {
     this.portfolioRepository = portfolioRepository;
     this.holderService = holderService;
     this.objectMapper = objectMapper;
     this.transactionRepository = transactionRepository;
     this.statisticService = statisticService;
+    this.holdingService = holdingService;
   }
 
   public void save(Portfolio portfolio, String email) {
@@ -59,20 +58,20 @@ public class PortfolioService {
         continue;
       }
 
-      List<String> tickers = getTickers(coinNetAmountProjectionList);
-      Map<String, Map<String, Double>> priceMap = fetchPricesForTickers(tickers);
+      List<Holding> holdings = holdingService.getHoldings(portfolio);
+      portfolio.setHoldings(holdings);
 
-      double totalBalance = calculateTotalBalance(coinNetAmountProjectionList, priceMap);
+      List<Transaction> transactions = transactionRepository.findByPortfolioId(portfolio.getId());
+      portfolio.setStatistics(statisticService.getStatistics(transactions, holdings));
+
+      double totalBalance = calculateTotalBalance(holdings);
+      System.out.println(totalBalance);
       portfolio.setTotalValue(totalBalance);
 
       double value24HoursAgo =
-          calculateValue24HoursAgoAdjusted(portfolio, coinNetAmountProjectionList, priceMap);
-
+          calculateValue24HoursAgoAdjusted(transactions, coinNetAmountProjectionList, holdings);
+      System.out.println(value24HoursAgo);
       portfolio.setTotalValueChange24h(totalBalance - value24HoursAgo);
-
-      List<Transaction> transactions = transactionRepository.findByPortfolioId(portfolio.getId());
-      portfolio.setStatistics(
-              statisticService.getStatistics(transactions, coinNetAmountProjectionList, priceMap));
     }
 
     return portfolioList;
@@ -91,74 +90,30 @@ public class PortfolioService {
     return portfolioRepository.findByIdAndHolderId(portfolioId, holderId);
   }
 
-  private List<String> getTickers(List<CoinNetAmountProjection> projections) {
-    return projections.stream()
-        .map(CoinNetAmountProjection::getCoinTicker)
-        .map(ticker -> ticker + "USDT")
-        .toList();
-  }
+  private double calculateTotalBalance(List<Holding> holdingList) {
+    double totalBalance = 0.0;
 
-  private Map<String, Map<String, Double>> fetchPricesForTickers(List<String> tickers) {
-    if (tickers.isEmpty()) return Collections.emptyMap();
-
-    String symbolsParam =
-        tickers.stream()
-            .map(ticker -> "\"" + ticker + "\"")
-            .collect(Collectors.joining(",", "[", "]"));
-    String url = "https://testnet.binance.vision/api/v3/ticker/24hr?symbols=" + symbolsParam;
-
-    try {
-      RestTemplate restTemplate = new RestTemplate();
-      String response = restTemplate.getForObject(url, String.class);
-      return parsePricesFromResponse(response);
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Collections.emptyMap();
+    for (Holding holding : holdingList) {
+      double quantity = holding.getQuantity();
+      double currentPrice = holding.getCurrentPrice();
+      totalBalance += quantity * currentPrice;
     }
-  }
 
-  private Map<String, Map<String, Double>> parsePricesFromResponse(String response)
-      throws IOException {
-    List<Map<String, String>> data = objectMapper.readValue(response, new TypeReference<>() {});
-
-    return data.stream()
-        .collect(
-            Collectors.toMap(
-                item -> item.get("symbol"),
-                item -> {
-                  Map<String, Double> priceData = new HashMap<>();
-                  priceData.put("price", Double.valueOf(item.get("lastPrice")));
-                  priceData.put("priceChange24hr", Double.valueOf(item.get("priceChange")));
-                  return priceData;
-                }));
-  }
-
-  private double calculateTotalBalance(
-      List<CoinNetAmountProjection> projections, Map<String, Map<String, Double>> priceMap) {
-    return projections.stream()
-        .mapToDouble(
-            projection -> {
-              String ticker = projection.getCoinTicker() + "USDT";
-              Double price = priceMap.get(ticker).get("price");
-              return (price != null) ? projection.getNetAmount() * price : 0;
-            })
-        .sum();
+    return totalBalance;
   }
 
   private double calculateValue24HoursAgoAdjusted(
-      Portfolio portfolio,
+      List<Transaction> transactions,
       List<CoinNetAmountProjection> coinNetAmountProjectionList,
-      Map<String, Map<String, Double>> priceMap) {
+      List<Holding> holdings) {
     double value24HoursAgo = 0.0;
     Map<String, Double> netAmounts24hAgo = new HashMap<>();
 
-    // Initialize net amounts as of now
     for (CoinNetAmountProjection projection : coinNetAmountProjectionList) {
       netAmounts24hAgo.put(projection.getCoinTicker(), projection.getNetAmount());
     }
 
-    // Adjust net amounts for transactions in the last 24 hours
-    List<Transaction> recentTransactions = getTransactionsInLast24Hours(portfolio);
+    List<Transaction> recentTransactions = getTransactionsInLast24Hours(transactions);
 
     for (Transaction transaction : recentTransactions) {
       String ticker = transaction.getCoin().getTicker();
@@ -171,21 +126,19 @@ public class PortfolioService {
       }
     }
 
-    // Calculate the value 24 hours ago using adjusted net amounts and historical prices
-    for (Map.Entry<String, Double> entry : netAmounts24hAgo.entrySet()) {
-      String ticker = entry.getKey() + "USDT";
-      double amountHeld24hAgo = entry.getValue();
-      double price24HoursAgo =
-          priceMap.get(ticker).get("price") - priceMap.get(ticker).get("priceChange24hr");
+    for (Holding holding : holdings) {
+      double netAmount = netAmounts24hAgo.getOrDefault(holding.getTicker(), 0.0);
+      double currentPrice = holding.getCurrentPrice();
+      double percentageChange = holding.getPricePercentageChange24h() / 100;
+      double historicalPrice = currentPrice / (1 + percentageChange);
 
-      value24HoursAgo += amountHeld24hAgo * price24HoursAgo;
+      value24HoursAgo += netAmount * historicalPrice;
     }
 
     return value24HoursAgo;
   }
 
-  private List<Transaction> getTransactionsInLast24Hours(Portfolio portfolio) {
-    List<Transaction> transactions = transactionRepository.findByPortfolioId(portfolio.getId());
+  private List<Transaction> getTransactionsInLast24Hours(List<Transaction> transactions) {
     return transactions.stream()
         .filter(transaction -> transaction.getDate().isAfter(OffsetDateTime.now().minusHours(24)))
         .toList();

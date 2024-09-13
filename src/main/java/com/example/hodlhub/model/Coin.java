@@ -18,10 +18,6 @@ public class Coin {
   private String name;
 
   @NotNull
-  @Column(name = "logo_url")
-  private String logo;
-
-  @NotNull
   @Column(name = "ticker")
   private String ticker;
 
@@ -42,14 +38,6 @@ public class Coin {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getLogo() {
-    return logo;
-  }
-
-  public void setLogo(String logo) {
-    this.logo = logo;
   }
 
   public String getTicker() {

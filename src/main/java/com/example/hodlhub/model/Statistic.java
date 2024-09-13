@@ -8,14 +8,10 @@ public class Statistic {
   private double allTotalBuySpent;
   private double bestPlValue;
   private double bestPlPercentValue;
-  private int bestCryptoId;
-  private String bestName;
-  private String bestSymbol;
+  private Coin bestCrypto;
   private double worstPlValue;
   private double worstPlPercentValue;
-  private int worstCryptoId;
-  private String worstName;
-  private String worstSymbol;
+  private Coin worstCoin;
   private List<PieChart> pieCharts;
 
   // Nested class for PieChart
@@ -113,28 +109,12 @@ public class Statistic {
     this.bestPlPercentValue = bestPlPercentValue;
   }
 
-  public int getBestCryptoId() {
-    return bestCryptoId;
+  public Coin getBestCrypto() {
+    return bestCrypto;
   }
 
-  public void setBestCryptoId(int bestCryptoId) {
-    this.bestCryptoId = bestCryptoId;
-  }
-
-  public String getBestName() {
-    return bestName;
-  }
-
-  public void setBestName(String bestName) {
-    this.bestName = bestName;
-  }
-
-  public String getBestSymbol() {
-    return bestSymbol;
-  }
-
-  public void setBestSymbol(String bestSymbol) {
-    this.bestSymbol = bestSymbol;
+  public void setBestCrypto(Coin bestCrypto) {
+    this.bestCrypto = bestCrypto;
   }
 
   public double getWorstPlValue() {
@@ -153,28 +133,12 @@ public class Statistic {
     this.worstPlPercentValue = worstPlPercentValue;
   }
 
-  public int getWorstCryptoId() {
-    return worstCryptoId;
+  public Coin getWorstCoin() {
+    return worstCoin;
   }
 
-  public void setWorstCryptoId(int worstCryptoId) {
-    this.worstCryptoId = worstCryptoId;
-  }
-
-  public String getWorstName() {
-    return worstName;
-  }
-
-  public void setWorstName(String worstName) {
-    this.worstName = worstName;
-  }
-
-  public String getWorstSymbol() {
-    return worstSymbol;
-  }
-
-  public void setWorstSymbol(String worstSymbol) {
-    this.worstSymbol = worstSymbol;
+  public void setWorstCoin(Coin worstCoin) {
+    this.worstCoin = worstCoin;
   }
 
   public List<PieChart> getPieCharts() {
