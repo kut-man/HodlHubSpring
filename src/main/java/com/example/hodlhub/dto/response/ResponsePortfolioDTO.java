@@ -2,7 +2,6 @@ package com.example.hodlhub.dto.response;
 
 import com.example.hodlhub.model.Holding;
 import com.example.hodlhub.model.Statistic;
-
 import java.util.List;
 
 public class ResponsePortfolioDTO {

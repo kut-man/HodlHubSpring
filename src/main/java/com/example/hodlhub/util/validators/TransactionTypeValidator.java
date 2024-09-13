@@ -1,7 +1,7 @@
 package com.example.hodlhub.util.validators;
 
-import com.example.hodlhub.util.enums.TransactionType;
 import com.example.hodlhub.util.annotations.ValidTransactionType;
+import com.example.hodlhub.util.enums.TransactionType;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

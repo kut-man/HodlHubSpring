@@ -2,10 +2,9 @@ package com.example.hodlhub.service;
 
 import com.example.hodlhub.model.Coin;
 import com.example.hodlhub.repository.CoinRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CoinService {

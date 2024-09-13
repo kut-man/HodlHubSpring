@@ -3,13 +3,12 @@ package com.example.hodlhub.service;
 import com.example.hodlhub.model.Holder;
 import com.example.hodlhub.repository.HolderRepository;
 import com.example.hodlhub.security.HolderDetails;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class HolderDetailsService implements UserDetailsService {

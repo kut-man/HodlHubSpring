@@ -2,7 +2,7 @@ package com.example.hodlhub.util;
 
 public interface CoinNetAmountProjection {
 
-    String getCoinTicker();
-    double getNetAmount();
+  String getCoinTicker();
 
+  double getNetAmount();
 }

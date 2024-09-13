@@ -1,10 +1,10 @@
 package com.example.hodlhub.util;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 
 public class ApiResponse<T> {
   private int status;
@@ -43,32 +43,6 @@ public class ApiResponse<T> {
           bindingResult.getFieldErrors().stream()
               .map(error -> new FieldError(error.getField(), error.getDefaultMessage()))
               .collect(Collectors.toList());
-    }
-  }
-
-  public static class FieldError {
-    private String field;
-    private String message;
-
-    public FieldError(String field, String message) {
-      this.field = field;
-      this.message = message;
-    }
-
-    public String getField() {
-      return field;
-    }
-
-    public void setField(String field) {
-      this.field = field;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-
-    public void setMessage(String message) {
-      this.message = message;
     }
   }
 
@@ -126,5 +100,31 @@ public class ApiResponse<T> {
 
   public void setTimestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public static class FieldError {
+    private String field;
+    private String message;
+
+    public FieldError(String field, String message) {
+      this.field = field;
+      this.message = message;
+    }
+
+    public String getField() {
+      return field;
+    }
+
+    public void setField(String field) {
+      this.field = field;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+
+    public void setMessage(String message) {
+      this.message = message;
+    }
   }
 }

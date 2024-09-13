@@ -211,7 +211,7 @@ public class HoldingService {
           double realizedProfit = (sellingPrice * amountSold) - (averageCostBasis * amountSold);
           realizedProfitByCoin.put(
               ticker, realizedProfitByCoin.getOrDefault(ticker, 0.0) + realizedProfit);
-          
+
           totalCostBasisPerCoin.put(ticker, totalCostBasis - (averageCostBasis * amountSold));
           totalAmountBoughtPerCoin.put(ticker, totalAmountBought - amountSold);
         }

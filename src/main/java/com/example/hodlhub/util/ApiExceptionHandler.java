@@ -2,12 +2,11 @@ package com.example.hodlhub.util;
 
 import com.example.hodlhub.util.exceptions.CoinNotExistsException;
 import com.example.hodlhub.util.exceptions.PortfolioNotExistsException;
+import java.time.format.DateTimeParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.time.format.DateTimeParseException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {

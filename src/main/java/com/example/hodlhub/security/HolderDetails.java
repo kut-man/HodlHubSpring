@@ -1,10 +1,9 @@
 package com.example.hodlhub.security;
 
 import com.example.hodlhub.model.Holder;
+import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
 
 public class HolderDetails implements UserDetails {
 

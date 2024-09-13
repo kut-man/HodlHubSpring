@@ -3,7 +3,6 @@ package com.example.hodlhub.util.annotations;
 import com.example.hodlhub.util.validators.TransactionTypeValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

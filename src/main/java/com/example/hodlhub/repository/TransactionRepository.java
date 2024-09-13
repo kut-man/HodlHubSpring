@@ -2,11 +2,10 @@ package com.example.hodlhub.repository;
 
 import com.example.hodlhub.model.Transaction;
 import com.example.hodlhub.util.CoinNetAmountProjection;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
   @Query(

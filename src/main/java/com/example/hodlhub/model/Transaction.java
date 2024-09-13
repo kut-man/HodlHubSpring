@@ -3,7 +3,6 @@ package com.example.hodlhub.model;
 import com.example.hodlhub.util.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-
 import java.time.OffsetDateTime;
 
 @Entity
