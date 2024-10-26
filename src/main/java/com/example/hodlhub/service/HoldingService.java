@@ -1,5 +1,6 @@
 package com.example.hodlhub.service;
 
+import static com.example.hodlhub.config.BaseCoin.BASE_CURRENCY;
 import com.example.hodlhub.model.Holding;
 import com.example.hodlhub.model.Portfolio;
 import com.example.hodlhub.model.Transaction;
@@ -43,7 +44,7 @@ public class HoldingService {
 
     for (CoinNetAmountProjection projection : coinNetAmountProjectionList) {
       String ticker = projection.getCoinTicker();
-      String tradingPair = ticker + "USDT";
+      String tradingPair = ticker + BASE_CURRENCY;
       double quantity = projection.getNetAmount();
 
       if (quantity == 0) {
@@ -71,6 +72,7 @@ public class HoldingService {
 
       double profitLoss =
           realizedProfit.getOrDefault(ticker, 0.0) + unrealizedProfit.getOrDefault(ticker, 0.0);
+      double plPercentValue = (profitLoss / (averagePurchasePrice * quantity)) * 100;
 
       Holding holding = new Holding();
       holding.setTicker(ticker);
@@ -79,10 +81,11 @@ public class HoldingService {
       holding.setAveragePurchasePrice(averagePurchasePrice);
       holding.setCurrentPrice(allCoinPricesMap.get(tradingPair));
       holding.setTotalValue(totalValue);
-      holding.setPricePercentageChange1h(priceChange1h);
-      holding.setPricePercentageChange24h(priceChange24h);
-      holding.setPricePercentageChange7d(priceChange7d);
-      holding.setProfitLoss(profitLoss);
+      holding.setOneHourChangePercent(priceChange1h);
+      holding.setYesterdayChangePercent(priceChange24h);
+      holding.setSevenDaysChangePercent(priceChange7d);
+      holding.setPlValue(profitLoss);
+      holding.setPlPercentValue(plPercentValue);
 
       holdings.add(holding);
     }
@@ -122,7 +125,7 @@ public class HoldingService {
     return tickerPrices;
   }
 
-  private Map<String, Double> fetchPricesForTickers(List<String> tradingPair) {
+  public Map<String, Double> fetchPricesForTickers(List<String> tradingPair) {
     RestTemplate restTemplate = new RestTemplate();
     if (tradingPair.isEmpty()) return Collections.emptyMap();
 
@@ -131,7 +134,7 @@ public class HoldingService {
             .map(ticker -> "\"" + ticker + "\"")
             .collect(Collectors.joining(",", "[", "]"));
     String url = "https://testnet.binance.vision/api/v3/ticker/price?symbols=" + symbolsParam;
-
+    System.out.println(url);
     try {
       String response = restTemplate.getForObject(url, String.class);
       return parsePricesFromResponse(response);
@@ -179,7 +182,7 @@ public class HoldingService {
   private List<String> getTickers(List<CoinNetAmountProjection> projections) {
     return projections.stream()
         .map(CoinNetAmountProjection::getCoinTicker)
-        .map(ticker -> ticker + "USDT")
+        .map(ticker -> ticker + BASE_CURRENCY)
         .toList();
   }
 
@@ -232,7 +235,7 @@ public class HoldingService {
       double amountHeld = projection.getNetAmount();
 
       if (amountHeld > 0) {
-        double currentMarketPrice = priceMap.get(ticker + "USDT");
+        double currentMarketPrice = priceMap.get(ticker + BASE_CURRENCY);
         double averageCostBasis = calculateAverageCostBasis(transactions, ticker);
 
         double unrealizedProfit =

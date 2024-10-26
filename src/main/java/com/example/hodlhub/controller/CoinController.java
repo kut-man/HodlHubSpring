@@ -28,7 +28,7 @@ public class CoinController {
 
   @GetMapping
   public ResponseEntity<ApiResponse<List<ResponseCoinDTO>>> getCoins() {
-    List<Coin> coinList = coinService.getCoins();
+    List<Coin> coinList = coinService.getCoinsWithPrices();
     List<ResponseCoinDTO> coinDTOList =
         coinList.stream()
             .map(coin -> modelMapper.map(coin, ResponseCoinDTO.class))

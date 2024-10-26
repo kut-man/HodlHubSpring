@@ -20,6 +20,9 @@ public class Coin {
   @Column(name = "ticker")
   private String ticker;
 
+  @Transient
+  private Double currentPrice;
+
   @OneToMany(mappedBy = "coin")
   private List<Transaction> transactionList;
 
@@ -45,6 +48,14 @@ public class Coin {
 
   public void setTicker(String ticker) {
     this.ticker = ticker;
+  }
+
+  public Double getCurrentPrice() {
+    return currentPrice;
+  }
+
+  public void setCurrentPrice(Double currentPrice) {
+    this.currentPrice = currentPrice;
   }
 
   public List<Transaction> getTransactionList() {

@@ -7,35 +7,13 @@ public class Holding {
   private double averagePurchasePrice;
   private double currentPrice;
   private double totalValue;
-  private double pricePercentageChange1h;
-  private double pricePercentageChange24h;
-  private double pricePercentageChange7d;
-  private double profitLoss;
+  private double oneHourChangePercent;
+  private double yesterdayChangePercent;
+  private double sevenDaysChangePercent;
+  private double plValue;
+  private double plPercentValue;
 
   public Holding() {}
-
-  public Holding(
-      String ticker,
-      String name,
-      double quantity,
-      double averagePurchasePrice,
-      double currentPrice,
-      double totalValue,
-      double pricePercentageChange1h,
-      double pricePercentageChange24h,
-      double pricePercentageChange7d,
-      double profitLoss) {
-    this.ticker = ticker;
-    this.name = name;
-    this.quantity = quantity;
-    this.averagePurchasePrice = averagePurchasePrice;
-    this.currentPrice = currentPrice;
-    this.totalValue = totalValue;
-    this.pricePercentageChange1h = pricePercentageChange1h;
-    this.pricePercentageChange24h = pricePercentageChange24h;
-    this.pricePercentageChange7d = pricePercentageChange7d;
-    this.profitLoss = profitLoss;
-  }
 
   public String getTicker() {
     return ticker;
@@ -85,35 +63,43 @@ public class Holding {
     this.totalValue = totalValue;
   }
 
-  public double getPricePercentageChange1h() {
-    return pricePercentageChange1h;
+  public double getOneHourChangePercent() {
+    return oneHourChangePercent;
   }
 
-  public void setPricePercentageChange1h(double pricePercentageChange1h) {
-    this.pricePercentageChange1h = pricePercentageChange1h;
+  public void setOneHourChangePercent(double oneHourChangePercent) {
+    this.oneHourChangePercent = oneHourChangePercent;
   }
 
-  public double getPricePercentageChange24h() {
-    return pricePercentageChange24h;
+  public double getYesterdayChangePercent() {
+    return yesterdayChangePercent;
   }
 
-  public void setPricePercentageChange24h(double pricePercentageChange24h) {
-    this.pricePercentageChange24h = pricePercentageChange24h;
+  public void setYesterdayChangePercent(double yesterdayChangePercent) {
+    this.yesterdayChangePercent = yesterdayChangePercent;
   }
 
-  public double getPricePercentageChange7d() {
-    return pricePercentageChange7d;
+  public double getSevenDaysChangePercent() {
+    return sevenDaysChangePercent;
   }
 
-  public void setPricePercentageChange7d(double pricePercentageChange7d) {
-    this.pricePercentageChange7d = pricePercentageChange7d;
+  public void setSevenDaysChangePercent(double sevenDaysChangePercent) {
+    this.sevenDaysChangePercent = sevenDaysChangePercent;
   }
 
-  public double getProfitLoss() {
-    return profitLoss;
+  public double getPlValue() {
+    return plValue;
   }
 
-  public void setProfitLoss(double profitLoss) {
-    this.profitLoss = profitLoss;
+  public void setPlValue(double plValue) {
+    this.plValue = plValue;
+  }
+
+  public double getPlPercentValue() {
+    return plPercentValue;
+  }
+
+  public void setPlPercentValue(double plPercentValue) {
+    this.plPercentValue = plPercentValue;
   }
 }

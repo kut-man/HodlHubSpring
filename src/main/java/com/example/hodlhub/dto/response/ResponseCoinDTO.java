@@ -7,6 +7,8 @@ public class ResponseCoinDTO {
 
   private String ticker;
 
+  private Double currentPrice;
+
   public int getId() {
     return id;
   }
@@ -29,5 +31,13 @@ public class ResponseCoinDTO {
 
   public void setTicker(String ticker) {
     this.ticker = ticker;
+  }
+
+  public Double getCurrentPrice() {
+    return currentPrice;
+  }
+
+  public void setCurrentPrice(Double currentPrice) {
+    this.currentPrice = currentPrice;
   }
 }

@@ -9,7 +9,6 @@ import com.example.hodlhub.repository.TransactionRepository;
 import com.example.hodlhub.util.CoinNetAmountProjection;
 import com.example.hodlhub.util.enums.TransactionType;
 import com.example.hodlhub.util.exceptions.PortfolioNotExistsException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.OffsetDateTime;
 import java.util.*;
 import org.springframework.stereotype.Service;
@@ -21,18 +20,15 @@ public class PortfolioService {
   private final HolderService holderService;
   private final StatisticService statisticService;
   private final HoldingService holdingService;
-  private final ObjectMapper objectMapper;
 
   public PortfolioService(
       PortfolioRepository portfolioRepository,
       HolderService holderService,
-      ObjectMapper objectMapper,
       TransactionRepository transactionRepository,
       StatisticService statisticService,
       HoldingService holdingService) {
     this.portfolioRepository = portfolioRepository;
     this.holderService = holderService;
-    this.objectMapper = objectMapper;
     this.transactionRepository = transactionRepository;
     this.statisticService = statisticService;
     this.holdingService = holdingService;
@@ -54,7 +50,7 @@ public class PortfolioService {
           transactionRepository.findNetAmountsByPortfolio(portfolio.getId());
 
       if (coinNetAmountProjectionList.isEmpty()) {
-        portfolio.setTotalValue(0);
+        portfolio.setTotalAmount(0);
         continue;
       }
 
@@ -64,14 +60,19 @@ public class PortfolioService {
       List<Transaction> transactions = transactionRepository.findByPortfolioId(portfolio.getId());
       portfolio.setStatistics(statisticService.getStatistics(transactions, holdings));
 
-      double totalBalance = calculateTotalBalance(holdings);
-      System.out.println(totalBalance);
-      portfolio.setTotalValue(totalBalance);
+      double totalAmount = calculateTotalAmount(holdings);
+      portfolio.setTotalAmount(totalAmount);
 
       double value24HoursAgo =
           calculateValue24HoursAgoAdjusted(transactions, coinNetAmountProjectionList, holdings);
-      System.out.println(value24HoursAgo);
-      portfolio.setTotalValueChange24h(totalBalance - value24HoursAgo);
+
+      portfolio.setValueChange24h(totalAmount - value24HoursAgo);
+
+      double percentageChange24h = 0;
+      if (value24HoursAgo != 0) {
+        percentageChange24h = ((totalAmount - value24HoursAgo) / value24HoursAgo) * 100;
+      }
+      portfolio.setValueChangePercentage24h(percentageChange24h);
     }
 
     return portfolioList;
@@ -90,16 +91,16 @@ public class PortfolioService {
     return portfolioRepository.findByIdAndHolderId(portfolioId, holderId);
   }
 
-  private double calculateTotalBalance(List<Holding> holdingList) {
-    double totalBalance = 0.0;
+  private double calculateTotalAmount(List<Holding> holdingList) {
+    double totalAmount = 0.0;
 
     for (Holding holding : holdingList) {
       double quantity = holding.getQuantity();
       double currentPrice = holding.getCurrentPrice();
-      totalBalance += quantity * currentPrice;
+      totalAmount += quantity * currentPrice;
     }
 
-    return totalBalance;
+    return totalAmount;
   }
 
   private double calculateValue24HoursAgoAdjusted(
@@ -129,7 +130,7 @@ public class PortfolioService {
     for (Holding holding : holdings) {
       double netAmount = netAmounts24hAgo.getOrDefault(holding.getTicker(), 0.0);
       double currentPrice = holding.getCurrentPrice();
-      double percentageChange = holding.getPricePercentageChange24h() / 100;
+      double percentageChange = holding.getYesterdayChangePercent() / 100;
       double historicalPrice = currentPrice / (1 + percentageChange);
 
       value24HoursAgo += netAmount * historicalPrice;
