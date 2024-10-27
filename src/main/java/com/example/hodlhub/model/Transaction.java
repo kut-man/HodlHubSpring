@@ -18,7 +18,7 @@ public class Transaction {
     private TransactionType transactionType;
     @Min(value = 0, message = "")
     @Column(name = "amount")
-    private long amount;
+    private double amount;
 
     @ManyToOne
     @JoinColumn(name = "coin_id", referencedColumnName = "id")
@@ -26,7 +26,7 @@ public class Transaction {
 
     @Min(value = 0)
     @Column(name = "price_per_unit")
-    private long pricePerCoin;
+    private float pricePerCoin;
 
     @ManyToOne
     @JoinColumn(name = "portfolio_id", referencedColumnName = "id")
@@ -51,11 +51,11 @@ public class Transaction {
         this.transactionType = transactionType;
     }
 
-    public long getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(long amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 
@@ -67,11 +67,11 @@ public class Transaction {
         this.coin = coin;
     }
 
-    public long getPricePerCoin() {
+    public float getPricePerCoin() {
         return pricePerCoin;
     }
 
-    public void setPricePerCoin(long pricePerCoin) {
+    public void setPricePerCoin(float pricePerCoin) {
         this.pricePerCoin = pricePerCoin;
     }
 

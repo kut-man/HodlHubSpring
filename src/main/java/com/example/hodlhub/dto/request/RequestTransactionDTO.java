@@ -8,13 +8,13 @@ public class RequestTransactionDTO {
   @ValidTransactionType private String transactionType;
 
   @Min(value = 0, message = "Transaction amount is empty!")
-  private long amount;
+  private double amount;
 
   @NotNull(message = "Transaction coin is empty!")
   private String coin;
 
   @Min(value = 0, message = "Transaction price per coin is empty!")
-  private long pricePerCoin;
+  private float pricePerCoin;
 
   @Min(value = 0, message = "Transaction portfolio ID is empty!")
   private int portfolioId;
@@ -29,11 +29,11 @@ public class RequestTransactionDTO {
     this.transactionType = transactionType;
   }
 
-  public long getAmount() {
+  public double getAmount() {
     return amount;
   }
 
-  public void setAmount(long amount) {
+  public void setAmount(double amount) {
     this.amount = amount;
   }
 
@@ -45,11 +45,11 @@ public class RequestTransactionDTO {
     this.coin = coin;
   }
 
-  public long getPricePerCoin() {
+  public float getPricePerCoin() {
     return pricePerCoin;
   }
 
-  public void setPricePerCoin(long pricePerCoin) {
+  public void setPricePerCoin(float pricePerCoin) {
     this.pricePerCoin = pricePerCoin;
   }
 
