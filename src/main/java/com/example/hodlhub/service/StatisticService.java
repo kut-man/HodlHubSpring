@@ -17,7 +17,14 @@ public class StatisticService {
     Statistic statistic = new Statistic();
     double totalPlValue = calculateTotalPlValue(holdingList);
     statistic.setTotalPlValue(totalPlValue);
-    statistic.setAllTotalBuySpent(calculateCostBasis(transactions));
+    double allTotalBuySpent = calculateCostBasis(transactions);
+    statistic.setAllTotalBuySpent(allTotalBuySpent);
+    if (allTotalBuySpent != 0) {
+      double totalPlPercentValue = (totalPlValue / allTotalBuySpent) * 100;
+      statistic.setTotalPlPercentValue(totalPlPercentValue);
+    } else {
+      statistic.setTotalPlPercentValue(0);
+    }
 
     Holding bestPerformer = findBestPerformer(holdingList).get();
     Holding worstPerformer = findWorstPerformer(holdingList).get();
