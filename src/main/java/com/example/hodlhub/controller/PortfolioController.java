@@ -80,8 +80,11 @@ public class PortfolioController {
   }
 
   @DeleteMapping("/{portfolioId}/{ticker}")
-  public ResponseEntity<?> removeAsset(@PathVariable int portfolioId, @PathVariable String ticker) {
-    portfolioService.removeAssetFromPortfolio(portfolioId, ticker);
+  public ResponseEntity<?> removeAsset(
+      @PathVariable int portfolioId,
+      @PathVariable String ticker,
+      @AuthenticationPrincipal HolderDetails holderDetails) {
+    portfolioService.removeAssetFromPortfolio(portfolioId, ticker, holderDetails.getUsername());
     HttpStatus status = HttpStatus.OK;
     ApiResponse<Void> response =
         new ApiResponse<>(status, "Asset removed successfully", "/portfolio");

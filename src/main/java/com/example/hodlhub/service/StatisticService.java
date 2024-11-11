@@ -26,8 +26,8 @@ public class StatisticService {
       statistic.setTotalPlPercentValue(0);
     }
 
-    Holding bestPerformer = findBestPerformer(holdingList).get();
-    Holding worstPerformer = findWorstPerformer(holdingList).get();
+    Holding bestPerformer = findBestPerformer(holdingList).orElse(new Holding());
+    Holding worstPerformer = findWorstPerformer(holdingList).orElse(new Holding());
 
     statistic.setBestName(bestPerformer.getName());
     statistic.setBestTicker(bestPerformer.getTicker());

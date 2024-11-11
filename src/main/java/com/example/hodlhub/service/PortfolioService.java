@@ -95,25 +95,26 @@ public class PortfolioService {
     return portfolioRepository.findByIdAndHolderId(portfolioId, holderId);
   }
 
-  public void removeAssetFromPortfolio(int portfolioId, String assetTicker) {
-    Portfolio portfolio =
-        portfolioRepository
-            .findById(portfolioId)
-            .orElseThrow(() -> new PortfolioNotExistsException("/portfolio"));
+  public void removeAssetFromPortfolio(int portfolioId, String assetTicker, String email) {
 
-    Coin coin =
-        coinRepository
-            .findByTicker(assetTicker)
-            .orElseThrow(() -> new CoinNotExistsException("/portfolio"));
+    Optional<Portfolio> portfolio = portfolioRepository.findById(portfolioId);
+    if (portfolio.isPresent() && Objects.equals(portfolio.get().getHolder().getEmail(), email)) {
+      Coin coin =
+          coinRepository
+              .findByTicker(assetTicker)
+              .orElseThrow(() -> new CoinNotExistsException("/portfolio"));
 
-    List<Transaction> transactions =
-        transactionRepository.findByPortfolioIdAndCoin(portfolioId, coin);
+      List<Transaction> transactions =
+          transactionRepository.findByPortfolioIdAndCoin(portfolioId, coin);
 
-    if (transactions.isEmpty()) {
-      throw new ResourceNotFoundException(
-          "No transactions found for the asset in the portfolio", "/portfolio");
+      if (transactions.isEmpty()) {
+        throw new ResourceNotFoundException(
+            "No transactions found for the asset in the portfolio", "/portfolio");
+      }
+      transactionRepository.deleteAll(transactions);
+    } else {
+      throw new PortfolioNotExistsException("/portfolio");
     }
-    transactionRepository.deleteAll(transactions);
   }
 
   private double calculateTotalAmount(List<Holding> holdingList) {
