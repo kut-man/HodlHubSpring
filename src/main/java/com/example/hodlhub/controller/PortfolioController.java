@@ -78,6 +78,16 @@ public class PortfolioController {
 
     return new ResponseEntity<>(response, status);
   }
+
+  @DeleteMapping("/{portfolioId}/{ticker}")
+  public ResponseEntity<?> removeAsset(@PathVariable int portfolioId, @PathVariable String ticker) {
+    portfolioService.removeAssetFromPortfolio(portfolioId, ticker);
+    HttpStatus status = HttpStatus.OK;
+    ApiResponse<Void> response =
+        new ApiResponse<>(status, "Asset removed successfully", "/portfolio");
+
+    return new ResponseEntity<>(response, status);
+  }
   //
   //    @ExceptionHandler(RuntimeException.class)
   //    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {

@@ -95,7 +95,7 @@ public class HoldingService {
 
   public Map<String, Map<String, Double>> fetchPricesForTicker(String tradingPair) {
     String url =
-        "https://testnet.binance.vision/api/v3/klines?symbol="
+        "https://api.binance.com/api/v3/klines?symbol="
             + tradingPair
             + "&interval=1h"
             + "&limit=168";

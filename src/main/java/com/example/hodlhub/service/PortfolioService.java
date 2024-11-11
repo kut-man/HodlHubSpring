@@ -1,22 +1,24 @@
 package com.example.hodlhub.service;
 
-import com.example.hodlhub.model.Holder;
-import com.example.hodlhub.model.Holding;
-import com.example.hodlhub.model.Portfolio;
-import com.example.hodlhub.model.Transaction;
+import com.example.hodlhub.model.*;
+import com.example.hodlhub.repository.CoinRepository;
 import com.example.hodlhub.repository.PortfolioRepository;
 import com.example.hodlhub.repository.TransactionRepository;
 import com.example.hodlhub.util.CoinNetAmountProjection;
 import com.example.hodlhub.util.enums.TransactionType;
+import com.example.hodlhub.util.exceptions.CoinNotExistsException;
 import com.example.hodlhub.util.exceptions.PortfolioNotExistsException;
 import java.time.OffsetDateTime;
 import java.util.*;
+
+import com.example.hodlhub.util.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PortfolioService {
   private final PortfolioRepository portfolioRepository;
   private final TransactionRepository transactionRepository;
+  private final CoinRepository coinRepository;
   private final HolderService holderService;
   private final StatisticService statisticService;
   private final HoldingService holdingService;
@@ -25,11 +27,13 @@ public class PortfolioService {
       PortfolioRepository portfolioRepository,
       HolderService holderService,
       TransactionRepository transactionRepository,
+      CoinRepository coinRepository,
       StatisticService statisticService,
       HoldingService holdingService) {
     this.portfolioRepository = portfolioRepository;
     this.holderService = holderService;
     this.transactionRepository = transactionRepository;
+    this.coinRepository = coinRepository;
     this.statisticService = statisticService;
     this.holdingService = holdingService;
   }
@@ -89,6 +93,27 @@ public class PortfolioService {
 
   public Portfolio getByIdAndUsername(int portfolioId, int holderId) {
     return portfolioRepository.findByIdAndHolderId(portfolioId, holderId);
+  }
+
+  public void removeAssetFromPortfolio(int portfolioId, String assetTicker) {
+    Portfolio portfolio =
+        portfolioRepository
+            .findById(portfolioId)
+            .orElseThrow(() -> new PortfolioNotExistsException("/portfolio"));
+
+    Coin coin =
+        coinRepository
+            .findByTicker(assetTicker)
+            .orElseThrow(() -> new CoinNotExistsException("/portfolio"));
+
+    List<Transaction> transactions =
+        transactionRepository.findByPortfolioIdAndCoin(portfolioId, coin);
+
+    if (transactions.isEmpty()) {
+      throw new ResourceNotFoundException(
+          "No transactions found for the asset in the portfolio", "/portfolio");
+    }
+    transactionRepository.deleteAll(transactions);
   }
 
   private double calculateTotalAmount(List<Holding> holdingList) {

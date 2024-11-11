@@ -1,5 +1,6 @@
 package com.example.hodlhub.repository;
 
+import com.example.hodlhub.model.Coin;
 import com.example.hodlhub.model.Transaction;
 import com.example.hodlhub.util.CoinNetAmountProjection;
 import java.util.List;
@@ -18,4 +19,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
   List<CoinNetAmountProjection> findNetAmountsByPortfolio(@Param("portfolioId") int portfolioId);
 
   List<Transaction> findByPortfolioId(int portfolioId);
+
+  List<Transaction> findByPortfolioIdAndCoin(int portfolioId, Coin coin);
 }
