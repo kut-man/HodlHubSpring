@@ -45,7 +45,7 @@ public class Portfolio {
   @Temporal(TemporalType.TIMESTAMP)
   private Date created;
 
-  @OneToMany(mappedBy = "portfolio")
+  @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Transaction> transactionList;
 
   public int getId() {

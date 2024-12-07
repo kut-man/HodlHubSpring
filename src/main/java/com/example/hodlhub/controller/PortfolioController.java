@@ -31,7 +31,7 @@ public class PortfolioController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse<?>> register(
+  public ResponseEntity<ApiResponse<?>> createPortfolio(
       @RequestBody @Valid RequestPortfolioDTO portfolioDTO,
       BindingResult bindingResult,
       @AuthenticationPrincipal HolderDetails holderDetails) {
@@ -53,7 +53,7 @@ public class PortfolioController {
   }
 
   @GetMapping
-  public ResponseEntity<ApiResponse<List<ResponsePortfolioDTO>>> getHolderPortfolios(
+  public ResponseEntity<ApiResponse<List<ResponsePortfolioDTO>>> getPortfolios(
       @AuthenticationPrincipal HolderDetails holderDetails) {
     List<Portfolio> portfolioList = portfolioService.get(holderDetails.getUsername());
     List<ResponsePortfolioDTO> portfolioDTOList =
@@ -64,6 +64,29 @@ public class PortfolioController {
     HttpStatus status = HttpStatus.OK;
     ApiResponse<List<ResponsePortfolioDTO>> response =
         new ApiResponse<>(status, portfolioDTOList, "/portfolio");
+
+    return new ResponseEntity<>(response, status);
+  }
+
+  @PutMapping("/{portfolioId}")
+  public ResponseEntity<ApiResponse<?>> editPortfolio(
+          @PathVariable int portfolioId,
+          @RequestBody @Valid RequestPortfolioDTO portfolioDTO,
+          BindingResult bindingResult,
+          @AuthenticationPrincipal HolderDetails holderDetails) {
+
+    if (bindingResult.hasErrors()) {
+      HttpStatus status = HttpStatus.BAD_REQUEST;
+      ApiResponse<Void> response = new ApiResponse<>(status, bindingResult, "/portfolio");
+      return new ResponseEntity<>(response, status);
+    }
+
+    Portfolio portfolio = modelMapper.map(portfolioDTO, Portfolio.class);
+    portfolioService.edit(portfolio, portfolioId, holderDetails.getUsername());
+
+    HttpStatus status = HttpStatus.OK;
+    ApiResponse<Void> response =
+            new ApiResponse<>(status, "Portfolio updated successfully", "/portfolio");
 
     return new ResponseEntity<>(response, status);
   }

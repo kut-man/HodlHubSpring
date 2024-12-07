@@ -45,6 +45,18 @@ public class PortfolioService {
     portfolioRepository.save(portfolio);
   }
 
+  public void edit(Portfolio portfolio, int portfolioId, String email) {
+    Holder holder = holderService.getHolder(email);
+    Portfolio portfolioToEdit =
+        portfolioRepository
+            .findByIdAndHolderId(portfolioId, holder.getId())
+            .orElseThrow(() -> new PortfolioNotExistsException("/portfolio"));
+    portfolioToEdit.setName(portfolio.getName());
+    portfolioToEdit.setColor(portfolio.getColor());
+    portfolioToEdit.setAvatar(portfolio.getAvatar());
+    portfolioRepository.save(portfolioToEdit);
+  }
+
   public List<Portfolio> get(String email) {
 
     List<Portfolio> portfolioList = holderService.getHolder(email).getPortfolioList();
@@ -91,7 +103,7 @@ public class PortfolioService {
     }
   }
 
-  public Portfolio getByIdAndUsername(int portfolioId, int holderId) {
+  public Optional<Portfolio> getByIdAndUsername(int portfolioId, int holderId) {
     return portfolioRepository.findByIdAndHolderId(portfolioId, holderId);
   }
 

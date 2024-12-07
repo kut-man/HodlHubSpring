@@ -11,6 +11,8 @@ import com.example.hodlhub.util.exceptions.PortfolioNotExistsException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,10 +60,10 @@ public class TransactionService {
   }
 
   public void save(Transaction transaction, String username) {
-    Portfolio portfolio =
+    Optional<Portfolio> portfolio =
         portfolioService.getByIdAndUsername(
             transaction.getPortfolio().getId(), holderService.getHolder(username).getId());
-    if (portfolio == null) throw new PortfolioNotExistsException("/transaction");
+    if (portfolio.isEmpty()) throw new PortfolioNotExistsException("/transaction");
 
     Coin coin = coinService.getCoinByTicker(transaction.getCoin().getTicker());
     if (coin == null) throw new CoinNotExistsException("/transaction");
