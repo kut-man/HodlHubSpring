@@ -14,7 +14,7 @@ public class Statistic {
   private double worstPlPercentValue;
   private String worstName;
   private String worstTicker;
-  private List<PieChart> pieCharts;
+  private List<AreaChart> areaChart;
 
   public Statistic() {}
 
@@ -106,63 +106,17 @@ public class Statistic {
     this.worstTicker = worstTicker;
   }
 
-  public List<PieChart> getPieCharts() {
-    return pieCharts;
+  public List<AreaChart> getAreaChart() {
+    return areaChart;
   }
 
-  public void setPieCharts(List<PieChart> pieCharts) {
-    this.pieCharts = pieCharts;
+  public void setAreaChart(List<AreaChart> areaChart) {
+    this.areaChart = areaChart;
   }
 
-  // Nested class for PieChart
-  public static class PieChart {
-    private double holdings;
-    private int cryptoId;
-    private String name;
-    private String symbol;
-    private double holdingsPercent;
+  public static class AreaChart {
 
-    // Constructors, Getters, and Setters
-    public PieChart() {}
+    public AreaChart() {}
 
-    public double getHoldings() {
-      return holdings;
-    }
-
-    public void setHoldings(double holdings) {
-      this.holdings = holdings;
-    }
-
-    public int getCryptoId() {
-      return cryptoId;
-    }
-
-    public void setCryptoId(int cryptoId) {
-      this.cryptoId = cryptoId;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public String getSymbol() {
-      return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-      this.symbol = symbol;
-    }
-
-    public double getHoldingsPercent() {
-      return holdingsPercent;
-    }
-
-    public void setHoldingsPercent(double holdingsPercent) {
-      this.holdingsPercent = holdingsPercent;
-    }
   }
 }
