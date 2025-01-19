@@ -16,4 +16,8 @@ public class HolderService {
   public Holder getHolder(String email) {
     return holderRepository.findByEmail(email).orElse(null);
   }
+
+  public void editHolder(Holder holder) {
+    holderRepository.save(holder);
+  }
 }
