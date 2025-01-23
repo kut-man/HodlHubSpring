@@ -35,10 +35,5 @@ COPY --from=build /app/target/HodlHub-0.0.1-SNAPSHOT.jar app.jar
 # Expose the port your application runs on
 EXPOSE 8080
 
-# Set environment variables for database connection
-ENV SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-cu98bsl6l47c73d7b0v0-a/postgres_9av6 \
-    SPRING_DATASOURCE_USERNAME=postgres_9av6_user \
-    SPRING_DATASOURCE_PASSWORD=VgoLIzJux8CxkBDFyyrAgrBnYN1rDPst
-
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
