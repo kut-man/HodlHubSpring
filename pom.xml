@@ -14,6 +14,7 @@
     <name>HodlHub</name>
     <description>HodlHub</description>
     <properties>
+        <!--Change it to 22-->
         <java.version>17</java.version>
     </properties>
     <dependencies>
