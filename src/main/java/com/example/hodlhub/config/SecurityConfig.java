@@ -101,7 +101,7 @@ public class SecurityConfig {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:5173", // Dev origin
-            "https://hodlhubspring.onrender.com" // Prod origin
+            "https://hodl-hub.vercel.app" // Prod origin
     ));
     configuration.setAllowedMethods(Arrays.asList("POST", "GET", "DELETE", "PUT"));
     configuration.setAllowCredentials(true);
