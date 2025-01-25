@@ -99,7 +99,10 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("http://localhost:5173");
+    configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:5173", // Dev origin
+            "https://hodlhubspring.onrender.com" // Prod origin
+    ));
     configuration.setAllowedMethods(Arrays.asList("POST", "GET", "DELETE", "PUT"));
     configuration.setAllowCredentials(true);
     configuration.addAllowedHeader("*");
