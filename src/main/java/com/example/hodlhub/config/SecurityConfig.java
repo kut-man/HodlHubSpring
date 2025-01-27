@@ -100,8 +100,8 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(
         Arrays.asList(
             "http://localhost:5173", // Dev origin
-            "https://hodl-hub.vercel.app", // Prod origin
-            "https://hodlhub.onrender.com/"));
+            "https://hodl-hub.vercel.app" // Prod origin
+            ));
     configuration.setAllowedMethods(Arrays.asList("POST", "GET", "DELETE", "PUT"));
     configuration.setAllowCredentials(true);
     configuration.addAllowedHeader("*");
