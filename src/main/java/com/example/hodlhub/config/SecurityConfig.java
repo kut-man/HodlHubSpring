@@ -50,9 +50,7 @@ public class SecurityConfig {
             logout ->
                 logout
                     .logoutUrl("/logout")
-                    .logoutSuccessHandler(
-                        new HttpStatusReturningLogoutSuccessHandler()) // Use
-                                                                       // HttpStatusReturningLogoutSuccessHandler
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID"))
         .exceptionHandling(
@@ -99,10 +97,11 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList(
+    configuration.setAllowedOrigins(
+        Arrays.asList(
             "http://localhost:5173", // Dev origin
-            "https://hodl-hub.vercel.app" // Prod origin
-    ));
+            "https://hodl-hub.vercel.app", // Prod origin
+            "https://hodlhub.onrender.com/"));
     configuration.setAllowedMethods(Arrays.asList("POST", "GET", "DELETE", "PUT"));
     configuration.setAllowCredentials(true);
     configuration.addAllowedHeader("*");
