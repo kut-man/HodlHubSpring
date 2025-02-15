@@ -1,5 +1,7 @@
 package com.example.hodlhub.service;
 
+import static com.example.hodlhub.config.BaseCoin.BASE_CURRENCY;
+
 import com.example.hodlhub.model.*;
 import com.example.hodlhub.repository.CoinRepository;
 import com.example.hodlhub.repository.PortfolioRepository;
@@ -8,10 +10,9 @@ import com.example.hodlhub.util.CoinNetAmountProjection;
 import com.example.hodlhub.util.enums.TransactionType;
 import com.example.hodlhub.util.exceptions.CoinNotExistsException;
 import com.example.hodlhub.util.exceptions.PortfolioNotExistsException;
+import com.example.hodlhub.util.exceptions.ResourceNotFoundException;
 import java.time.OffsetDateTime;
 import java.util.*;
-
-import com.example.hodlhub.util.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,41 +58,52 @@ public class PortfolioService {
     portfolioRepository.save(portfolioToEdit);
   }
 
-  public List<Portfolio> get(String email) {
-
+  public List<Portfolio> getUserPortfolioSummaries(String email) {
     List<Portfolio> portfolioList = holderService.getHolder(email).getPortfolioList();
 
     for (Portfolio portfolio : portfolioList) {
-      List<CoinNetAmountProjection> coinNetAmountProjectionList =
-          transactionRepository.findNetAmountsByPortfolio(portfolio.getId());
-
-      if (coinNetAmountProjectionList.isEmpty()) {
-        portfolio.setTotalAmount(0);
-        continue;
-      }
-
-      List<Holding> holdings = holdingService.getHoldings(portfolio);
-      portfolio.setHoldings(holdings);
-
-      List<Transaction> transactions = transactionRepository.findByPortfolioId(portfolio.getId());
-      portfolio.setStatistics(statisticService.getStatistics(transactions, holdings));
-
-      double totalAmount = calculateTotalAmount(holdings);
+      double totalAmount = calculateTotalAmount(portfolio);
       portfolio.setTotalAmount(totalAmount);
-
-      double value24HoursAgo =
-          calculateValue24HoursAgoAdjusted(transactions, coinNetAmountProjectionList, holdings);
-
-      portfolio.setValueChange24h(totalAmount - value24HoursAgo);
-
-      double percentageChange24h = 0;
-      if (value24HoursAgo != 0) {
-        percentageChange24h = ((totalAmount - value24HoursAgo) / value24HoursAgo) * 100;
-      }
-      portfolio.setValueChangePercentage24h(percentageChange24h);
     }
 
     return portfolioList;
+  }
+
+  public Portfolio getById(int portfolioId) {
+    Portfolio portfolio =
+        portfolioRepository
+            .findById(portfolioId)
+            .orElseThrow(() -> new PortfolioNotExistsException("/portfolio"));
+
+    List<CoinNetAmountProjection> coinNetAmountProjectionList =
+        transactionRepository.findNetAmountsByPortfolio(portfolio.getId());
+
+    if (coinNetAmountProjectionList.isEmpty()) {
+      portfolio.setTotalAmount(0.0);
+      return portfolio;
+    }
+
+    List<Holding> holdings = holdingService.getHoldings(portfolio);
+    portfolio.setHoldings(holdings);
+
+    List<Transaction> transactions = transactionRepository.findByPortfolioId(portfolio.getId());
+    portfolio.setStatistics(statisticService.getStatistics(transactions, holdings));
+
+    double totalAmount = calculateTotalAmount(holdings);
+    portfolio.setTotalAmount(totalAmount);
+
+    double value24HoursAgo =
+        calculateValue24HoursAgoAdjusted(transactions, coinNetAmountProjectionList, holdings);
+
+    portfolio.setValueChange24h(totalAmount - value24HoursAgo);
+
+    double percentageChange24h = 0;
+    if (value24HoursAgo != 0) {
+      percentageChange24h = ((totalAmount - value24HoursAgo) / value24HoursAgo) * 100;
+    }
+    portfolio.setValueChangePercentage24h(percentageChange24h);
+
+    return portfolio;
   }
 
   public void removePortfolioByNameAndHolder(int portfolioId, String email) {
@@ -127,6 +139,24 @@ public class PortfolioService {
     } else {
       throw new PortfolioNotExistsException("/portfolio");
     }
+  }
+
+  private double calculateTotalAmount(Portfolio portfolio) {
+    double totalAmount = 0.0;
+    List<CoinNetAmountProjection> coinNetAmountProjectionList =
+        transactionRepository.findNetAmountsByPortfolio(portfolio.getId());
+    List<String> tickers = holdingService.getTickers(coinNetAmountProjectionList);
+    Map<String, Double> allCoinPricesMap = holdingService.fetchPricesForTickers(tickers);
+
+    for (CoinNetAmountProjection projection : coinNetAmountProjectionList) {
+      String ticker = projection.getCoinTicker();
+      String tradingPair = ticker + BASE_CURRENCY;
+      double quantity = projection.getNetAmount();
+      double currentPrice = allCoinPricesMap.get(tradingPair);
+      totalAmount += quantity * currentPrice;
+    }
+
+    return totalAmount;
   }
 
   private double calculateTotalAmount(List<Holding> holdingList) {

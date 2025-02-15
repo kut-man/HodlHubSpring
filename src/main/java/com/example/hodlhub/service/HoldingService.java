@@ -99,7 +99,7 @@ public class HoldingService {
             + tradingPair
             + "&interval=1h"
             + "&limit=168";
-
+    System.out.println(url);
     try {
       RestTemplate restTemplate = new RestTemplate();
       String response = restTemplate.getForObject(url, String.class);
@@ -179,7 +179,7 @@ public class HoldingService {
     return pricesMap;
   }
 
-  private List<String> getTickers(List<CoinNetAmountProjection> projections) {
+  public List<String> getTickers(List<CoinNetAmountProjection> projections) {
     return projections.stream()
         .map(CoinNetAmountProjection::getCoinTicker)
         .map(ticker -> ticker + BASE_CURRENCY)

@@ -36,7 +36,6 @@ INSERT INTO hodlhub.Coin (name, ticker) VALUES ('EOS', 'EOS');
 INSERT INTO hodlhub.Coin (name, ticker) VALUES ('MultiversX', 'EGLD');
 INSERT INTO hodlhub.Coin (name, ticker) VALUES ('Theta Network', 'THETA');
 INSERT INTO hodlhub.Coin (name, ticker) VALUES ('Tezos', 'XTZ');
-INSERT INTO hodlhub.Coin (name, ticker) VALUES ('Fantom', 'FTM');
 INSERT INTO hodlhub.Coin (name, ticker) VALUES ('Decentraland', 'MANA');
 INSERT INTO hodlhub.Coin (name, ticker) VALUES ('Axie Infinity', 'AXS');
 INSERT INTO hodlhub.Coin (name, ticker) VALUES ('Chiliz', 'CHZ');

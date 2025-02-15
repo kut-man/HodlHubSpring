@@ -55,7 +55,8 @@ public class PortfolioController {
   @GetMapping
   public ResponseEntity<ApiResponse<List<ResponsePortfolioDTO>>> getPortfolios(
       @AuthenticationPrincipal HolderDetails holderDetails) {
-    List<Portfolio> portfolioList = portfolioService.get(holderDetails.getUsername());
+    List<Portfolio> portfolioList =
+        portfolioService.getUserPortfolioSummaries(holderDetails.getUsername());
     List<ResponsePortfolioDTO> portfolioDTOList =
         portfolioList.stream()
             .map(portfolio -> modelMapper.map(portfolio, ResponsePortfolioDTO.class))
@@ -68,12 +69,25 @@ public class PortfolioController {
     return new ResponseEntity<>(response, status);
   }
 
+  @GetMapping("/{portfolioId}")
+  public ResponseEntity<ApiResponse<ResponsePortfolioDTO>> getPortfolio(
+      @AuthenticationPrincipal HolderDetails holderDetails, @PathVariable int portfolioId) {
+    Portfolio portfolio = portfolioService.getById(portfolioId);
+    ResponsePortfolioDTO portfolioDTO = modelMapper.map(portfolio, ResponsePortfolioDTO.class);
+
+    HttpStatus status = HttpStatus.OK;
+    ApiResponse<ResponsePortfolioDTO> response =
+        new ApiResponse<>(status, portfolioDTO, "/portfolio");
+
+    return new ResponseEntity<>(response, status);
+  }
+
   @PutMapping("/{portfolioId}")
   public ResponseEntity<ApiResponse<?>> editPortfolio(
-          @PathVariable int portfolioId,
-          @RequestBody @Valid RequestPortfolioDTO portfolioDTO,
-          BindingResult bindingResult,
-          @AuthenticationPrincipal HolderDetails holderDetails) {
+      @PathVariable int portfolioId,
+      @RequestBody @Valid RequestPortfolioDTO portfolioDTO,
+      BindingResult bindingResult,
+      @AuthenticationPrincipal HolderDetails holderDetails) {
 
     if (bindingResult.hasErrors()) {
       HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -86,7 +100,7 @@ public class PortfolioController {
 
     HttpStatus status = HttpStatus.OK;
     ApiResponse<Void> response =
-            new ApiResponse<>(status, "Portfolio updated successfully", "/portfolio");
+        new ApiResponse<>(status, "Portfolio updated successfully", "/portfolio");
 
     return new ResponseEntity<>(response, status);
   }

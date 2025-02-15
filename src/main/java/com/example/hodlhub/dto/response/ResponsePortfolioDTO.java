@@ -9,9 +9,9 @@ public class ResponsePortfolioDTO {
   private String name;
   private String avatar;
   private String color;
-  private double totalAmount;
-  private double valueChange24h;
-  private double valueChangePercentage24h;
+  private Double totalAmount;
+  private Double valueChange24h;
+  private Double valueChangePercentage24h;
   private List<Holding> holdings;
   private Statistic statistics;
 
@@ -47,27 +47,27 @@ public class ResponsePortfolioDTO {
     this.color = color;
   }
 
-  public double getTotalAmount() {
+  public Double getTotalAmount() {
     return totalAmount;
   }
 
-  public void setTotalAmount(double totalAmount) {
+  public void setTotalAmount(Double totalAmount) {
     this.totalAmount = totalAmount;
   }
 
-  public double getValueChange24h() {
+  public Double getValueChange24h() {
     return valueChange24h;
   }
 
-  public void setValueChange24h(double valueChange24h) {
+  public void setValueChange24h(Double valueChange24h) {
     this.valueChange24h = valueChange24h;
   }
 
-  public double getValueChangePercentage24h() {
+  public Double getValueChangePercentage24h() {
     return valueChangePercentage24h;
   }
 
-  public void setValueChangePercentage24h(double valueChangePercentage24h) {
+  public void setValueChangePercentage24h(Double valueChangePercentage24h) {
     this.valueChangePercentage24h = valueChangePercentage24h;
   }
 

@@ -23,11 +23,11 @@ public class Portfolio {
   @NotEmpty
   private String avatar;
 
-  @Transient private double totalAmount;
+  @Transient private Double totalAmount;
 
-  @Transient private double valueChange24h;
+  @Transient private Double valueChange24h;
 
-  @Transient private double valueChangePercentage24h;
+  @Transient private Double valueChangePercentage24h;
 
   @Transient private List<Holding> holdings;
 
@@ -72,27 +72,27 @@ public class Portfolio {
     this.avatar = avatar;
   }
 
-  public double getTotalAmount() {
+  public Double getTotalAmount() {
     return totalAmount;
   }
 
-  public void setTotalAmount(double totalAmount) {
+  public void setTotalAmount(Double totalAmount) {
     this.totalAmount = totalAmount;
   }
 
-  public double getValueChange24h() {
+  public Double getValueChange24h() {
     return valueChange24h;
   }
 
-  public void setValueChange24h(double valueChange24h) {
+  public void setValueChange24h(Double valueChange24h) {
     this.valueChange24h = valueChange24h;
   }
 
-  public double getValueChangePercentage24h() {
+  public Double getValueChangePercentage24h() {
     return valueChangePercentage24h;
   }
 
-  public void setValueChangePercentage24h(double valueChangePercentage24h) {
+  public void setValueChangePercentage24h(Double valueChangePercentage24h) {
     this.valueChangePercentage24h = valueChangePercentage24h;
   }
 
