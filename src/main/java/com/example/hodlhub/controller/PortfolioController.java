@@ -1,10 +1,11 @@
 package com.example.hodlhub.controller;
 
 import com.example.hodlhub.dto.request.RequestPortfolioDTO;
+import com.example.hodlhub.dto.response.ResponseChartDataDTO;
 import com.example.hodlhub.dto.response.ResponsePortfolioDTO;
 import com.example.hodlhub.model.Portfolio;
 import com.example.hodlhub.security.HolderDetails;
-import com.example.hodlhub.service.HolderService;
+import com.example.hodlhub.service.PortfolioChartService;
 import com.example.hodlhub.service.PortfolioService;
 import com.example.hodlhub.util.ApiResponse;
 import jakarta.validation.Valid;
@@ -23,11 +24,15 @@ public class PortfolioController {
 
   private final PortfolioService portfolioService;
   private final ModelMapper modelMapper;
+  private final PortfolioChartService portfolioChartService;
 
   public PortfolioController(
-      PortfolioService portfolioService, ModelMapper modelMapper, HolderService holderService) {
+      PortfolioService portfolioService,
+      ModelMapper modelMapper,
+      PortfolioChartService portfolioChartService) {
     this.portfolioService = portfolioService;
     this.modelMapper = modelMapper;
+    this.portfolioChartService = portfolioChartService;
   }
 
   @PostMapping
@@ -72,12 +77,28 @@ public class PortfolioController {
   @GetMapping("/{portfolioId}")
   public ResponseEntity<ApiResponse<ResponsePortfolioDTO>> getPortfolio(
       @AuthenticationPrincipal HolderDetails holderDetails, @PathVariable int portfolioId) {
-    Portfolio portfolio = portfolioService.getById(portfolioId);
+    Portfolio portfolio = portfolioService.getById(portfolioId, holderDetails.getUsername());
     ResponsePortfolioDTO portfolioDTO = modelMapper.map(portfolio, ResponsePortfolioDTO.class);
 
     HttpStatus status = HttpStatus.OK;
     ApiResponse<ResponsePortfolioDTO> response =
         new ApiResponse<>(status, portfolioDTO, "/portfolio");
+
+    return new ResponseEntity<>(response, status);
+  }
+
+  @GetMapping("/{portfolioId}/chart/{interval}")
+  public ResponseEntity<ApiResponse<List<ResponseChartDataDTO>>> getPortfolioChart(
+      @AuthenticationPrincipal HolderDetails holderDetails,
+      @PathVariable int portfolioId,
+      @PathVariable String interval) {
+    List<ResponseChartDataDTO> chartDataDTO =
+        portfolioChartService.getPortfolioHistoricalValue(
+            portfolioId, holderDetails.getUsername(), interval);
+
+    HttpStatus status = HttpStatus.OK;
+    ApiResponse<List<ResponseChartDataDTO>> response =
+        new ApiResponse<>(status, chartDataDTO, "/portfolio");
 
     return new ResponseEntity<>(response, status);
   }

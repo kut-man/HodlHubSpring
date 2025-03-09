@@ -69,10 +69,11 @@ public class PortfolioService {
     return portfolioList;
   }
 
-  public Portfolio getById(int portfolioId) {
+  public Portfolio getById(int portfolioId, String email) {
+    Holder holder = holderService.getHolder(email);
     Portfolio portfolio =
         portfolioRepository
-            .findById(portfolioId)
+            .findByIdAndHolderId(portfolioId, holder.getId())
             .orElseThrow(() -> new PortfolioNotExistsException("/portfolio"));
 
     List<CoinNetAmountProjection> coinNetAmountProjectionList =

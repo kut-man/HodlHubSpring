@@ -1,6 +1,7 @@
 package com.example.hodlhub.service;
 
 import static com.example.hodlhub.config.BaseCoin.BASE_CURRENCY;
+
 import com.example.hodlhub.model.Holding;
 import com.example.hodlhub.model.Portfolio;
 import com.example.hodlhub.model.Transaction;
@@ -10,6 +11,7 @@ import com.example.hodlhub.util.enums.TransactionType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,16 @@ public class HoldingService {
 
   private final ObjectMapper objectMapper;
   private final TransactionRepository transactionRepository;
+  private final BinanceApiClient binanceApiClient;
 
   @Autowired
-  public HoldingService(ObjectMapper objectMapper, TransactionRepository transactionRepository) {
+  public HoldingService(
+      ObjectMapper objectMapper,
+      TransactionRepository transactionRepository,
+      BinanceApiClient binanceApiClient) {
     this.objectMapper = objectMapper;
     this.transactionRepository = transactionRepository;
+    this.binanceApiClient = binanceApiClient;
   }
 
   public List<Holding> getHoldings(Portfolio portfolio) {
@@ -51,14 +58,23 @@ public class HoldingService {
         continue;
       }
 
-      Map<String, Map<String, Double>> pricesMap = fetchPricesForTicker(tradingPair);
+      Map<LocalDateTime, Double> pricesMap =
+          binanceApiClient.fetchHistoricalPrices(tradingPair, "1h", 168); // 168 hours (7 days)
+
       if (pricesMap.isEmpty()) {
         continue;
       }
 
-      double price7dAgo = pricesMap.get(tradingPair + "_7dAgo").get("closePrice");
-      double price1hAgo = pricesMap.get(tradingPair + "_1hAgo").get("openPrice");
-      double price24hAgo = pricesMap.get(tradingPair + "_24hAgo").get("closePrice");
+      List<Double> pricesList = new ArrayList<>(pricesMap.values());
+
+      int size = pricesList.size();
+      double price7dAgo = size >= 168 ? pricesList.get(size - 168) : -1; // 7 days ago
+      double price24hAgo = size >= 24 ? pricesList.get(size - 24) : -1; // 24 hours ago
+      double price1hAgo = size >= 1 ? pricesList.get(size - 1) : -1; // 1 hour ago
+
+      if (price7dAgo == -1 || price24hAgo == -1 || price1hAgo == -1) {
+        System.out.println("Not enough data to fetch historical prices.");
+      }
 
       double priceChange1h = ((allCoinPricesMap.get(tradingPair) - price1hAgo) / price1hAgo) * 100;
       double priceChange24h =
@@ -93,38 +109,6 @@ public class HoldingService {
     return holdings;
   }
 
-  public Map<String, Map<String, Double>> fetchPricesForTicker(String tradingPair) {
-    String url =
-        "https://api.binance.com/api/v3/klines?symbol="
-            + tradingPair
-            + "&interval=1h"
-            + "&limit=168";
-    System.out.println(url);
-    try {
-      RestTemplate restTemplate = new RestTemplate();
-      String response = restTemplate.getForObject(url, String.class);
-      return parsePricesFromResponse(response, tradingPair);
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Collections.emptyMap();
-    }
-  }
-
-  private Map<String, Double> extractPricesFromKline(List<Object> kline) {
-    double openPrice = Double.parseDouble((String) kline.get(1));
-    double highPrice = Double.parseDouble((String) kline.get(2));
-    double lowPrice = Double.parseDouble((String) kline.get(3));
-    double closePrice = Double.parseDouble((String) kline.get(4));
-
-    Map<String, Double> tickerPrices = new HashMap<>();
-    tickerPrices.put("openPrice", openPrice);
-    tickerPrices.put("highPrice", highPrice);
-    tickerPrices.put("lowPrice", lowPrice);
-    tickerPrices.put("closePrice", closePrice);
-
-    return tickerPrices;
-  }
-
   public Map<String, Double> fetchPricesForTickers(List<String> tradingPair) {
     RestTemplate restTemplate = new RestTemplate();
     if (tradingPair.isEmpty()) return Collections.emptyMap();
@@ -150,33 +134,6 @@ public class HoldingService {
         .collect(
             Collectors.toMap(
                 item -> item.get("symbol"), item -> Double.valueOf(item.get("price"))));
-  }
-
-  private Map<String, Map<String, Double>> parsePricesFromResponse(
-      String response, String tradingPair) {
-    Map<String, Map<String, Double>> pricesMap = new HashMap<>();
-
-    try {
-      List<List<Object>> klineData = objectMapper.readValue(response, new TypeReference<>() {});
-
-      if (!klineData.isEmpty() && klineData.size() >= 167) {
-        List<Object> firstHour = klineData.get(0);
-        Map<String, Double> firstHourPrices = extractPricesFromKline(firstHour);
-        pricesMap.put(tradingPair + "_7dAgo", firstHourPrices);
-
-        List<Object> twentyFourthHour = klineData.get(klineData.size() - 23);
-        Map<String, Double> twentyFourthHourPrices = extractPricesFromKline(twentyFourthHour);
-        pricesMap.put(tradingPair + "_24hAgo", twentyFourthHourPrices);
-
-        List<Object> lastHour = klineData.get(klineData.size() - 1);
-        Map<String, Double> lastHourPrices = extractPricesFromKline(lastHour);
-        pricesMap.put(tradingPair + "_1hAgo", lastHourPrices);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    return pricesMap;
   }
 
   public List<String> getTickers(List<CoinNetAmountProjection> projections) {
