@@ -81,24 +81,4 @@ public class Holder {
   public void setPortfolioList(List<Portfolio> portfolioList) {
     this.portfolioList = portfolioList;
   }
-
-  @Override
-  public String toString() {
-    return "Holder{"
-        + "id="
-        + id
-        + ", name='"
-        + name
-        + '\''
-        + ", email='"
-        + email
-        + '\''
-        + ", password='"
-        + password
-        + '\''
-        + ", avatar='"
-        + avatar
-        + '\''
-        + '}';
-  }
 }

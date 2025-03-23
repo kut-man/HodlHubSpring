@@ -38,6 +38,7 @@ public class BinanceApiClient {
         .queryParam(
             "startTime", startTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
         .queryParam("endTime", endTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
+        .queryParam("timeZone", "1")
         .build()
         .toString();
   }

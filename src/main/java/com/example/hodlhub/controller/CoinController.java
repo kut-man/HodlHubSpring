@@ -5,7 +5,6 @@ import com.example.hodlhub.model.Coin;
 import com.example.hodlhub.service.CoinService;
 import com.example.hodlhub.util.ApiResponse;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,7 @@ public class CoinController {
     List<ResponseCoinDTO> coinDTOList =
         coinList.stream()
             .map(coin -> modelMapper.map(coin, ResponseCoinDTO.class))
-            .collect(Collectors.toList());
+            .toList();
 
     HttpStatus status = HttpStatus.OK;
     ApiResponse<List<ResponseCoinDTO>> response = new ApiResponse<>(status, coinDTOList, "/coin");

@@ -10,7 +10,6 @@ import com.example.hodlhub.service.PortfolioService;
 import com.example.hodlhub.util.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class PortfolioController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse<?>> createPortfolio(
+  public ResponseEntity<ApiResponse<Void>> createPortfolio(
       @RequestBody @Valid RequestPortfolioDTO portfolioDTO,
       BindingResult bindingResult,
       @AuthenticationPrincipal HolderDetails holderDetails) {
@@ -65,7 +64,7 @@ public class PortfolioController {
     List<ResponsePortfolioDTO> portfolioDTOList =
         portfolioList.stream()
             .map(portfolio -> modelMapper.map(portfolio, ResponsePortfolioDTO.class))
-            .collect(Collectors.toList());
+            .toList();
 
     HttpStatus status = HttpStatus.OK;
     ApiResponse<List<ResponsePortfolioDTO>> response =
@@ -104,7 +103,7 @@ public class PortfolioController {
   }
 
   @PutMapping("/{portfolioId}")
-  public ResponseEntity<ApiResponse<?>> editPortfolio(
+  public ResponseEntity<ApiResponse<Void>> editPortfolio(
       @PathVariable int portfolioId,
       @RequestBody @Valid RequestPortfolioDTO portfolioDTO,
       BindingResult bindingResult,
@@ -127,7 +126,7 @@ public class PortfolioController {
   }
 
   @DeleteMapping("/{portfolioId}")
-  public ResponseEntity<?> removePortfolio(
+  public ResponseEntity<ApiResponse<Void>> removePortfolio(
       @PathVariable int portfolioId, @AuthenticationPrincipal HolderDetails holderDetails) {
     portfolioService.removePortfolioByNameAndHolder(portfolioId, holderDetails.getUsername());
     HttpStatus status = HttpStatus.OK;

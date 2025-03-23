@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HolderRepository extends JpaRepository<Holder, Integer> {
   Optional<Holder> findByEmail(String email);
+  boolean existsByEmail(String email);
 }

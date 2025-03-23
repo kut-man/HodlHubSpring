@@ -41,12 +41,35 @@ public class AuthenticationController {
       ApiResponse<Void> response = new ApiResponse<>(status, bindingResult, "/portfolio");
       return new ResponseEntity<>(response, status);
     }
-    registrationService.save(holder);
+
+    registrationService.registerHolder(holder);
 
     HttpStatus status = HttpStatus.CREATED;
     ApiResponse<Void> response =
-        new ApiResponse<>(status, "User created successfully", "/auth/register");
+        new ApiResponse<>(
+            status,
+            "Registration successful. Please verify your email to complete your account setup.",
+            "/auth");
 
     return new ResponseEntity<>(response, status);
+  }
+
+  @GetMapping("/verify-email")
+  public ResponseEntity<ApiResponse<Void>> verifyEmail(
+      @RequestParam("code") String verificationCode, @RequestParam("email") String email) {
+
+    boolean isVerified = registrationService.verifyEmail(email, verificationCode);
+
+    if (isVerified) {
+      HttpStatus status = HttpStatus.OK;
+      ApiResponse<Void> response =
+          new ApiResponse<>(status, "Email verified successfully", "/auth");
+      return new ResponseEntity<>(response, status);
+    } else {
+      HttpStatus status = HttpStatus.BAD_REQUEST;
+      ApiResponse<Void> response =
+          new ApiResponse<>(status, "Invalid or expired verification code", "/auth");
+      return new ResponseEntity<>(response, status);
+    }
   }
 }

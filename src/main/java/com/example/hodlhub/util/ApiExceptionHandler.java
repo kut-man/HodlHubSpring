@@ -1,6 +1,7 @@
 package com.example.hodlhub.util;
 
 import com.example.hodlhub.util.exceptions.CoinNotExistsException;
+import com.example.hodlhub.util.exceptions.EmailSendingException;
 import com.example.hodlhub.util.exceptions.PortfolioNotExistsException;
 import com.example.hodlhub.util.exceptions.ResourceNotFoundException;
 import java.time.format.DateTimeParseException;
@@ -29,6 +30,13 @@ public class ApiExceptionHandler {
 
   @ExceptionHandler(value = {ResourceNotFoundException.class})
   public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException e) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    ApiResponse<Void> response = new ApiResponse<>(status, e.getMessage(), e.getPath());
+    return new ResponseEntity<>(response, status);
+  }
+
+  @ExceptionHandler(value = {EmailSendingException.class})
+  public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(EmailSendingException e) {
     HttpStatus status = HttpStatus.BAD_REQUEST;
     ApiResponse<Void> response = new ApiResponse<>(status, e.getMessage(), e.getPath());
     return new ResponseEntity<>(response, status);

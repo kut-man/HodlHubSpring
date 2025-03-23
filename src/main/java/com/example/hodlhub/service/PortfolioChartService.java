@@ -18,25 +18,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class PortfolioChartService {
   private static final Map<String, TimeFrame> INTERVAL_MAP = new HashMap<>();
+  private static final int MAX_DATA_POINTS = 300;
 
   static {
-    INTERVAL_MAP.put("1m", new TimeFrame(400, ChronoUnit.MINUTES));
-    INTERVAL_MAP.put("3m", new TimeFrame(1200, ChronoUnit.MINUTES));
-    INTERVAL_MAP.put("5m", new TimeFrame(2000, ChronoUnit.MINUTES));
-    INTERVAL_MAP.put("15m", new TimeFrame(6000, ChronoUnit.MINUTES));
-    INTERVAL_MAP.put("30m", new TimeFrame(12000, ChronoUnit.MINUTES));
+    INTERVAL_MAP.put("1m", new TimeFrame(1, ChronoUnit.MINUTES));
+    INTERVAL_MAP.put("3m", new TimeFrame(3, ChronoUnit.MINUTES));
+    INTERVAL_MAP.put("5m", new TimeFrame(5, ChronoUnit.MINUTES));
+    INTERVAL_MAP.put("15m", new TimeFrame(15, ChronoUnit.MINUTES));
+    INTERVAL_MAP.put("30m", new TimeFrame(30, ChronoUnit.MINUTES));
 
-    INTERVAL_MAP.put("1h", new TimeFrame(400, ChronoUnit.HOURS));
-    INTERVAL_MAP.put("2h", new TimeFrame(800, ChronoUnit.HOURS));
-    INTERVAL_MAP.put("4h", new TimeFrame(1600, ChronoUnit.HOURS));
-    INTERVAL_MAP.put("6h", new TimeFrame(2400, ChronoUnit.HOURS));
-    INTERVAL_MAP.put("8h", new TimeFrame(3200, ChronoUnit.HOURS));
-    INTERVAL_MAP.put("12h", new TimeFrame(4800, ChronoUnit.HOURS));
+    INTERVAL_MAP.put("1h", new TimeFrame(1, ChronoUnit.HOURS));
+    INTERVAL_MAP.put("2h", new TimeFrame(2, ChronoUnit.HOURS));
+    INTERVAL_MAP.put("4h", new TimeFrame(4, ChronoUnit.HOURS));
+    INTERVAL_MAP.put("6h", new TimeFrame(6, ChronoUnit.HOURS));
+    INTERVAL_MAP.put("8h", new TimeFrame(8, ChronoUnit.HOURS));
+    INTERVAL_MAP.put("12h", new TimeFrame(12, ChronoUnit.HOURS));
 
-    INTERVAL_MAP.put("1d", new TimeFrame(400, ChronoUnit.DAYS));
-    INTERVAL_MAP.put("3d", new TimeFrame(1200, ChronoUnit.DAYS));
+    INTERVAL_MAP.put("1d", new TimeFrame(1, ChronoUnit.DAYS));
+    INTERVAL_MAP.put("3d", new TimeFrame(3, ChronoUnit.DAYS));
 
-    INTERVAL_MAP.put("1w", new TimeFrame(400, ChronoUnit.WEEKS));
+    INTERVAL_MAP.put("1w", new TimeFrame(1, ChronoUnit.WEEKS));
   }
 
   private final TransactionRepository transactionRepository;
@@ -46,17 +47,18 @@ public class PortfolioChartService {
 
   @Autowired
   public PortfolioChartService(
-          TransactionRepository transactionRepository,
-          HolderService holderService,
-          PortfolioService portfolioService,
-          BinanceApiClient binanceApiClient) {
+      TransactionRepository transactionRepository,
+      HolderService holderService,
+      PortfolioService portfolioService,
+      BinanceApiClient binanceApiClient) {
     this.transactionRepository = transactionRepository;
     this.holderService = holderService;
     this.portfolioService = portfolioService;
     this.binanceApiClient = binanceApiClient;
   }
 
-  public List<ResponseChartDataDTO> getPortfolioHistoricalValue(int portfolioId, String email, String interval) {
+  public List<ResponseChartDataDTO> getPortfolioHistoricalValue(
+      int portfolioId, String email, String interval) {
     if (!INTERVAL_MAP.containsKey(interval)) {
       throw new IllegalArgumentException("Invalid interval: " + interval);
     }
@@ -64,9 +66,9 @@ public class PortfolioChartService {
     Holder holder = holderService.getHolder(email);
 
     Portfolio portfolio =
-            portfolioService
-                    .getByIdAndUsername(portfolioId, holder.getId())
-                    .orElseThrow(() -> new PortfolioNotExistsException("/portfolio"));
+        portfolioService
+            .getByIdAndUsername(portfolioId, holder.getId())
+            .orElseThrow(() -> new PortfolioNotExistsException("/portfolio"));
 
     List<Transaction> transactions = transactionRepository.findByPortfolioId(portfolio.getId());
     if (transactions.isEmpty()) {
@@ -74,39 +76,46 @@ public class PortfolioChartService {
     }
 
     Set<String> uniqueCoins =
-            transactions.stream().map(t -> t.getCoin().getTicker()).collect(Collectors.toSet());
+        transactions.stream().map(t -> t.getCoin().getTicker()).collect(Collectors.toSet());
 
-    LocalDateTime endDate = OffsetDateTime.now(ZoneOffset.UTC).toLocalDateTime();
-    LocalDateTime startDate = INTERVAL_MAP.get(interval).subtractFromDate(endDate);
+    LocalDateTime endDate = OffsetDateTime.now(ZoneId.systemDefault()).toLocalDateTime();
+
+    TimeFrame timeFrame = INTERVAL_MAP.get(interval);
+    LocalDateTime startDate = calculateStartDate(endDate, timeFrame);
 
     Map<String, TreeMap<LocalDateTime, Double>> historicalPrices = new HashMap<>();
     for (String coin : uniqueCoins) {
       historicalPrices.put(
-              coin,
-              binanceApiClient.fetchHistoricalPrices(coin + BASE_CURRENCY, interval, startDate, endDate));
+          coin,
+          binanceApiClient.fetchHistoricalPrices(
+              coin + BASE_CURRENCY, interval, startDate, endDate));
     }
 
     List<ResponseChartDataDTO> chartData = new ArrayList<>();
-    TimeFrame timeFrame = INTERVAL_MAP.get(interval);
+    LocalDateTime currentDate = startDate;
 
-    while (!startDate.isAfter(endDate)) {
+    while (!currentDate.isAfter(endDate)) {
       double portfolioValue =
-              calculatePortfolioValueForDate(startDate, transactions, historicalPrices);
+          calculatePortfolioValueForDate(currentDate, transactions, historicalPrices);
 
-      chartData.add(new ResponseChartDataDTO(startDate, portfolioValue));
-      startDate = timeFrame.addToDate(startDate);
+      chartData.add(new ResponseChartDataDTO(currentDate, portfolioValue));
+      currentDate = timeFrame.addToDate(currentDate);
     }
 
     return chartData;
   }
 
+  private LocalDateTime calculateStartDate(LocalDateTime endDate, TimeFrame timeFrame) {
+    return endDate.minus(MAX_DATA_POINTS * timeFrame.amount(), timeFrame.unit());
+  }
+
   private double calculatePortfolioValueForDate(
-          LocalDateTime date,
-          List<Transaction> transactions,
-          Map<String, TreeMap<LocalDateTime, Double>> historicalPrices) {
+      LocalDateTime date,
+      List<Transaction> transactions,
+      Map<String, TreeMap<LocalDateTime, Double>> historicalPrices) {
 
     List<Transaction> relevantTransactions =
-            transactions.stream().filter(t -> !t.getDate().toLocalDateTime().isAfter(date)).toList();
+        transactions.stream().filter(t -> !t.getDate().toLocalDateTime().isAfter(date)).toList();
 
     Map<String, Double> holdings = new HashMap<>();
     for (Transaction t : relevantTransactions) {
@@ -138,7 +147,8 @@ public class PortfolioChartService {
     return totalValue;
   }
 
-  public Optional<Double> getPriceNearestTo(LocalDateTime dateTime, TreeMap<LocalDateTime, Double> prices) {
+  public Optional<Double> getPriceNearestTo(
+      LocalDateTime dateTime, TreeMap<LocalDateTime, Double> prices) {
     Double exactPrice = prices.get(dateTime);
     if (exactPrice != null) {
       return Optional.of(exactPrice);
@@ -158,13 +168,12 @@ public class PortfolioChartService {
   }
 
   private record TimeFrame(long amount, ChronoUnit unit) {
-
     LocalDateTime subtractFromDate(LocalDateTime date) {
-        return date.minus(amount, unit);
-      }
-
-      LocalDateTime addToDate(LocalDateTime date) {
-        return date.plus(1, unit);
-      }
+      return date.minus(amount, unit);
     }
+
+    LocalDateTime addToDate(LocalDateTime date) {
+      return date.plus(amount, unit);
+    }
+  }
 }
