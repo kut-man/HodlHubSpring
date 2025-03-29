@@ -18,9 +18,6 @@ public class EmailService {
   @Value("${spring.mail.username}")
   private String fromEmail;
 
-  @Value("${app.frontend.url}")
-  private String frontendUrl;
-
   @Autowired
   public EmailService(JavaMailSender mailSender) {
     this.mailSender = mailSender;
@@ -35,21 +32,32 @@ public class EmailService {
       helper.setFrom(fromEmail);
       helper.setTo(toEmail);
       helper.setSubject("HodlHub Email Verification");
-
-      String verificationLink =
-          frontendUrl + "/verify-email?code=" + verificationCode + "&email=" + toEmail;
-
       String emailContent =
-          "<h1>Welcome to HodlHub!</h1>"
-              + "<p>Thank you for registering. Please verify your email address by clicking the link below:</p>"
-              + "<p><a href='"
-              + verificationLink
-              + "'>Verify Email</a></p>"
-              + "<p>Or enter this verification code: <strong>"
+          "<!DOCTYPE html>"
+              + "<html>"
+              + "<head>"
+              + "<style>"
+              + "body { font-family: sans-serif; line-height: 1.6; color: #333; }"
+              + "h1 { color: #007bff; }"
+              + // Example blue color
+              "strong { background-color: #f0f0f0; padding: 5px; border-radius: 3px; }"
+              + "p { margin-bottom: 15px; }"
+              + ".footer { margin-top: 20px; font-size: 0.8em; color: #777; }"
+              + "</style>"
+              + "</head>"
+              + "<body>"
+              + "<h1>Welcome to HodlHub!</h1>"
+              + "<p>Thank you for registering. Please verify your email address by "
+              + "entering this verification code: <strong>"
               + verificationCode
               + "</strong></p>"
               + "<p>This code will expire in 24 hours.</p>"
-              + "<p>If you did not create an account, please ignore this email.</p>";
+              + "<p>Once your account is verified, you'll have full access to your account features.</p>"
+              + "<p>Didn’t request this email?</p>"
+              + "<p>Your address may have been entered by mistake. Simply ignore this email, and nothing further will happen.</p>"
+              + "<p class=\"footer\">This is an automatically generated email. Please do not reply.</p>"
+              + "</body>"
+              + "</html>";
 
       helper.setText(emailContent, true);
 

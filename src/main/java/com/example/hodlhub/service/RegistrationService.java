@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class RegistrationService {
@@ -35,18 +36,30 @@ public class RegistrationService {
   @Transactional
   public void registerHolder(Holder holder) {
     String encodedPassword = passwordEncoder.encode(holder.getPassword());
-
     String verificationCode = generateVerificationCode();
+    LocalDateTime now = LocalDateTime.now();
 
-    EmailVerification verification = new EmailVerification();
-    verification.setEmail(holder.getEmail());
-    verification.setName(holder.getName());
-    verification.setEncodedPassword(encodedPassword);
-    verification.setVerificationCode(verificationCode);
-    verification.setCreatedAt(LocalDateTime.now());
-    verification.setExpiresAt(LocalDateTime.now().plusHours(24));
+    Optional<EmailVerification> existingVerificationOpt =
+        emailVerificationRepository.findByEmail(holder.getEmail());
 
-    emailVerificationRepository.save(verification);
+    if (existingVerificationOpt.isPresent()) {
+      EmailVerification existingVerification = existingVerificationOpt.get();
+      existingVerification.setName(holder.getName());
+      existingVerification.setEncodedPassword(encodedPassword);
+      existingVerification.setVerificationCode(verificationCode);
+      existingVerification.setCreatedAt(now);
+      existingVerification.setExpiresAt(now.plusHours(24));
+      emailVerificationRepository.save(existingVerification);
+    } else {
+      EmailVerification verification = new EmailVerification();
+      verification.setEmail(holder.getEmail());
+      verification.setName(holder.getName());
+      verification.setEncodedPassword(encodedPassword);
+      verification.setVerificationCode(verificationCode);
+      verification.setCreatedAt(now);
+      verification.setExpiresAt(now.plusHours(24));
+      emailVerificationRepository.save(verification);
+    }
 
     emailService.sendVerificationEmail(holder.getEmail(), verificationCode);
   }
