@@ -34,6 +34,8 @@ public class Holder {
   @OneToMany(mappedBy = "holder")
   private List<Portfolio> portfolioList;
 
+  @Transient private String recaptchaToken;
+
   public int getId() {
     return id;
   }
@@ -80,5 +82,13 @@ public class Holder {
 
   public void setPortfolioList(List<Portfolio> portfolioList) {
     this.portfolioList = portfolioList;
+  }
+
+  public String getRecaptchaToken() {
+    return recaptchaToken;
+  }
+
+  public void setRecaptchaToken(String recaptchaToken) {
+    this.recaptchaToken = recaptchaToken;
   }
 }

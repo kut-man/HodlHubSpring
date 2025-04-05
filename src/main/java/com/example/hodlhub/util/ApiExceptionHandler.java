@@ -1,9 +1,7 @@
 package com.example.hodlhub.util;
 
-import com.example.hodlhub.util.exceptions.CoinNotExistsException;
-import com.example.hodlhub.util.exceptions.EmailSendingException;
-import com.example.hodlhub.util.exceptions.PortfolioNotExistsException;
-import com.example.hodlhub.util.exceptions.ResourceNotFoundException;
+import com.example.hodlhub.util.exceptions.*;
+
 import java.time.format.DateTimeParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +21,13 @@ public class ApiExceptionHandler {
 
   @ExceptionHandler(value = {CoinNotExistsException.class})
   public ResponseEntity<ApiResponse<Void>> handleCoinNotFoundException(CoinNotExistsException e) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    ApiResponse<Void> response = new ApiResponse<>(status, e.getMessage(), e.getPath());
+    return new ResponseEntity<>(response, status);
+  }
+
+  @ExceptionHandler(value = {RecaptchaVerificationException.class})
+  public ResponseEntity<ApiResponse<Void>> handleRecaptchaVerificationException(RecaptchaVerificationException e) {
     HttpStatus status = HttpStatus.BAD_REQUEST;
     ApiResponse<Void> response = new ApiResponse<>(status, e.getMessage(), e.getPath());
     return new ResponseEntity<>(response, status);

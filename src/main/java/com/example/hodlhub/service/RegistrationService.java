@@ -4,14 +4,21 @@ import com.example.hodlhub.model.EmailVerification;
 import com.example.hodlhub.model.Holder;
 import com.example.hodlhub.repository.EmailVerificationRepository;
 import com.example.hodlhub.repository.HolderRepository;
+import com.example.hodlhub.util.exceptions.RecaptchaVerificationException;
 import com.example.hodlhub.util.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -20,21 +27,47 @@ public class RegistrationService {
   private final PasswordEncoder passwordEncoder;
   private final EmailVerificationRepository emailVerificationRepository;
   private final EmailService emailService;
+  private final String recaptchaSecret;
+  private static final String RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
   @Autowired
   public RegistrationService(
       HolderRepository holderRepository,
       PasswordEncoder passwordEncoder,
       EmailVerificationRepository emailVerificationRepository,
-      EmailService emailService) {
+      EmailService emailService,
+      @Value("${google.recaptcha.secret}") String recaptchaSecret) {
     this.holderRepository = holderRepository;
     this.passwordEncoder = passwordEncoder;
     this.emailVerificationRepository = emailVerificationRepository;
     this.emailService = emailService;
+    this.recaptchaSecret = recaptchaSecret;
+  }
+
+  public boolean verifyRecaptchaToken(String token) {
+    RestTemplate restTemplate = new RestTemplate();
+    try {
+      MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+      params.add("secret", recaptchaSecret);
+      params.add("response", token);
+
+      ResponseEntity<Map> response =
+          restTemplate.postForEntity(RECAPTCHA_VERIFY_URL, params, Map.class);
+
+      Map<String, Object> body = response.getBody();
+
+      return Boolean.TRUE.equals(body.get("success"));
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   @Transactional
   public void registerHolder(Holder holder) {
+    if (!verifyRecaptchaToken(holder.getRecaptchaToken())) {
+      throw new RecaptchaVerificationException("/auth");
+    }
+
     String encodedPassword = passwordEncoder.encode(holder.getPassword());
     String verificationCode = generateVerificationCode();
     LocalDateTime now = LocalDateTime.now();

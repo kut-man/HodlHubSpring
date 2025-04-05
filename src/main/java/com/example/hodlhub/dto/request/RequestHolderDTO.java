@@ -1,8 +1,6 @@
 package com.example.hodlhub.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 public class RequestHolderDTO {
   @NotEmpty(message = "Name is missing!")
@@ -14,8 +12,12 @@ public class RequestHolderDTO {
   private String email;
 
   @NotEmpty(message = "Password is missing!")
-  @Size(min = 6, message = "Password should be longer than 6 characters!")
+  @Size(min = 8, message = "Password should be at least 8 characters!")
+  @Pattern(regexp = ".*\\d.*", message = "Password must contain at least one number!")
   private String password;
+
+  @NotBlank(message = "reCAPTCHA verification is required!")
+  private String recaptchaToken;
 
   private String avatar;
 
@@ -41,6 +43,14 @@ public class RequestHolderDTO {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public String getRecaptchaToken() {
+    return recaptchaToken;
+  }
+
+  public void setRecaptchaToken(String recaptchaToken) {
+    this.recaptchaToken = recaptchaToken;
   }
 
   public String getAvatar() {
