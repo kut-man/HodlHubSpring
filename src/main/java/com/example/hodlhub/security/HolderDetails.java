@@ -2,10 +2,15 @@ package com.example.hodlhub.security;
 
 import com.example.hodlhub.model.Holder;
 import java.util.Collection;
+import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class HolderDetails implements UserDetails {
+import java.io.Serializable;
+
+public class HolderDetails implements UserDetails, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final Holder holder;
 
@@ -13,20 +18,23 @@ public class HolderDetails implements UserDetails {
         this.holder = holder;
     }
 
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return this.holder.getPassword();
+    public Holder getHolder() {
+        return holder;
     }
 
     @Override
     public String getUsername() {
-        return this.holder.getEmail();
+        return this.holder != null ? this.holder.getEmail() : null;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.holder != null ? this.holder.getPassword() : null;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
     }
 
     @Override
