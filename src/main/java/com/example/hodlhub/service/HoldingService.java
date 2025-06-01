@@ -88,7 +88,9 @@ public class HoldingService {
 
       double profitLoss =
           realizedProfit.getOrDefault(ticker, 0.0) + unrealizedProfit.getOrDefault(ticker, 0.0);
-      double plPercentValue = (profitLoss / (averagePurchasePrice * quantity)) * 100;
+
+      double totalCost = averagePurchasePrice * quantity;
+      double plPercentValue = (totalCost != 0) ? (profitLoss / totalCost) * 100 : 0.0;
 
       Holding holding = new Holding();
       holding.setTicker(ticker);

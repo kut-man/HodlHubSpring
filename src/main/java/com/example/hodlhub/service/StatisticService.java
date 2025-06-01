@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.hodlhub.util.enums.TransactionType;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -49,8 +50,10 @@ public class StatisticService {
     double totalCost = 0.0;
 
     for (Transaction transaction : transactions) {
-      double cost = transaction.getAmount() * transaction.getPricePerCoin();
-      totalCost += cost;
+      if (transaction.getTransactionType() == TransactionType.BUY) {
+        double cost = transaction.getAmount() * transaction.getPricePerCoin();
+        totalCost += cost;
+      }
     }
 
     return totalCost;
