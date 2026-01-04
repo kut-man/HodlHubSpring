@@ -48,7 +48,7 @@ public class AuthenticationController {
     ApiResponse<Void> response =
         new ApiResponse<>(
             status,
-            "Registration successful. Please verify your email to complete your account setup.",
+            "Registration was successful. Please verify your email to complete your account setup.",
             "/auth");
 
     return new ResponseEntity<>(response, status);
