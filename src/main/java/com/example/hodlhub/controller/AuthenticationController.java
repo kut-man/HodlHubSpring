@@ -34,6 +34,7 @@ public class AuthenticationController {
   @PostMapping("/register")
   public ResponseEntity<ApiResponse<Void>> register(
       @RequestBody @Valid RequestHolderDTO requestHolderDTO, BindingResult bindingResult) {
+
     Holder holder = modelMapper.map(requestHolderDTO, Holder.class);
     holderValidator.validate(holder, bindingResult);
     if (bindingResult.hasErrors()) {

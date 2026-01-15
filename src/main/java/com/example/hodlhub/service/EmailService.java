@@ -26,6 +26,7 @@ public class EmailService {
   @Async
   public void sendVerificationEmail(String toEmail, String verificationCode) {
     try {
+      System.out.println("sendVerificationEmail is called.");
       MimeMessage message = mailSender.createMimeMessage();
       MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -63,8 +64,47 @@ public class EmailService {
 
       mailSender.send(message);
     } catch (MessagingException e) {
+
+
+
+      System.err.println("=== MESSAGING EXCEPTION ===");
+      System.err.println("Failed to send email to: " + toEmail);
+      System.err.println("Error message: " + e.getMessage());
+      System.err.println("Error class: " + e.getClass().getName());
+
+      if (e.getCause() != null) {
+        System.err.println("Root cause: " + e.getCause().getMessage());
+        System.err.println("Root cause class: " + e.getCause().getClass().getName());
+      }
+
+      // Check for specific error types
+      String errorMsg = e.getMessage();
+      if (errorMsg != null) {
+        if (errorMsg.contains("Authentication") || errorMsg.contains("535")) {
+          System.err.println(">>> AUTHENTICATION FAILED - Check username/password/app password");
+        } else if (errorMsg.contains("Connection") || errorMsg.contains("timeout")) {
+          System.err.println(">>> CONNECTION FAILED - Check host/port/firewall");
+        } else if (errorMsg.contains("550")) {
+          System.err.println(">>> RECIPIENT REJECTED - Check recipient email address");
+        } else if (errorMsg.contains("SSL") || errorMsg.contains("TLS")) {
+          System.err.println(">>> SSL/TLS ERROR - Check port and security settings");
+        }
+      }
+
+
+      System.err.println("Full stack trace:");
+      e.printStackTrace();
+      System.err.println("=== END MESSAGING EXCEPTION ===");
+
       throw new EmailSendingException("Failed to send verification email to: " + toEmail, "/auth");
     } catch (Exception e) {
+      System.err.println("=== UNEXPECTED EXCEPTION ===");
+      System.err.println("Unexpected error when sending email to: " + toEmail);
+      System.err.println("Error type: " + e.getClass().getName());
+      System.err.println("Error message: " + e.getMessage());
+      System.err.println("Full stack trace:");
+      e.printStackTrace();
+      System.err.println("=== END UNEXPECTED EXCEPTION ===");
       throw new EmailSendingException(
           "Unexpected error when sending email to: " + toEmail, "/auth");
     }

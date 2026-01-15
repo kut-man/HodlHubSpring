@@ -73,9 +73,11 @@ public class RegistrationService {
 
   @Transactional
   public void registerHolder(Holder holder) {
+    System.out.println("RegisterHolder is called!!!");
     if (!verifyRecaptchaToken(holder.getRecaptchaToken())) {
       throw new RecaptchaVerificationException("/auth");
     }
+    System.out.println("Recaptcha token verified.");
 
     String encodedPassword = passwordEncoder.encode(holder.getPassword());
     String verificationCode = generateVerificationCode();
