@@ -97,10 +97,10 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(
+    configuration.setAllowedOriginPatterns(
         Arrays.asList(
             "http://localhost:5173", // Dev origin
-            "https://hodl-hub.vercel.app" // Prod origin
+            "https://*.vercel.app" // Prod origin
             ));
     configuration.setAllowedMethods(Arrays.asList("POST", "GET", "DELETE", "PUT"));
     configuration.setAllowCredentials(true);

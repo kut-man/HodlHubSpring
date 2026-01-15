@@ -56,7 +56,16 @@ public class RegistrationService {
 
       Map<String, Object> body = response.getBody();
 
-      return Boolean.TRUE.equals(body.get("success"));
+      boolean success = Boolean.TRUE.equals(body.get("success"));
+
+      if (!success) {
+        return false;
+      }
+
+      Double score = (Double) body.get("score");
+      double threshold = 0.5;
+
+      return score != null && score >= threshold;
     } catch (Exception e) {
       return false;
     }
